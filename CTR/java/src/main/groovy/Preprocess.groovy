@@ -1,3 +1,4 @@
+import org.apache.commons.lang3.StringUtils
 import org.codehaus.groovy.runtime.ResourceGroovyMethods
 
 /**
@@ -40,18 +41,27 @@ class Preprocess {
     }
 
     def run() {
-        def result =[:]
+        def result = [:]
         def columns = [:]
         def writer = outFile.newPrintWriter()
-        ResourceGroovyMethods.eachLine(inFile){line, number->
-            if (number == 1) {
-                result[line]=[:]
-                columns[0]= line
-                writer.println(line)
-                return
+        ResourceGroovyMethods.eachLine(inFile) { String line, number ->
+            def outLine = []
+            line.split(',').eachWithIndex { String word, int i ->
+                if (number == 1) {
+                    result[word] = [:]
+                    columns[i] = word
+                    outLine+=word
+                } else {
+                    def countIdxTuple = result[columns[i]][word]
+                    if (!countIdxTuple){
+                        countIdxTuple = [0, result[columns[i]].size()]
+                        result[columns[i]][word] = countIdxTuple
+                    }
+                    (countIdxTuple as List)[0]+=1
+                    outLine+=(countIdxTuple as List)[1]
+                }
             }
-            result[columns[0]][line] = 1
-            writer.println(1)
+            writer.println(StringUtils.join(outLine, ','))
         }
         writer.close()
         result
