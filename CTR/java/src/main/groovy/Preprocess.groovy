@@ -7,43 +7,18 @@ import org.codehaus.groovy.runtime.ResourceGroovyMethods
 class Preprocess {
     private File inFile;
     private File outFile;
+    private def result
+    private int totalRows=0
 
     public static void main(String[] args) {
         def file = new File('D:\\workspace\\projects\\szelenin\\kaggle\\CTR\\data\\tmp.csv')
-        def columns = [:]
-        def uniqueCounts = [:]
-
-        ResourceGroovyMethods.eachLine(file) { line, number ->
-            (line as String).split(',').eachWithIndex { Serializable entry, int i ->
-                if (number == 1) {
-                    columns[i] = entry
-                } else {
-                    def counts = uniqueCounts[columns[i]]
-                    if (!counts) {
-                        counts = [entry: [:]]
-                    }
-
-                    if (counts) {
-                        def valueCount = counts[entry as String]
-                        if (valueCount) {
-                            counts[entry as String] += 1
-                        }
-//                        = ++valueCount
-                    } else {
-                        uniqueCounts[columns[i]] = counts
-                    }
-                }
-            }
-        }
-        println "uniqueCounts = $uniqueCounts"
-        println "columns = $columns"
-
     }
 
     def run(Set compactColumns = [] as Set) {
         def result = [:]
         def columns = [:]
         def writer = outFile.newPrintWriter()
+
         ResourceGroovyMethods.eachLine(inFile) { String line, number ->
             def outLine = []
             line.split(',').eachWithIndex { String word, int i ->
@@ -68,9 +43,16 @@ class Preprocess {
                     }
                 }
             }
+            totalRows++
             writer.println(StringUtils.join(outLine, ','))
         }
         writer.close()
+        this.result = result
         result
+    }
+
+    @Override
+    String toString() {
+        "$result\r\ntotal:${totalRows-1}"
     }
 }

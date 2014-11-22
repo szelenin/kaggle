@@ -99,6 +99,7 @@ class PreprocessTest extends Specification {
         assert outLines[1] == 'value1,0,0'
         assert outLines[2] == 'value1,1,1'
         assert outLines[3] == 'value1,1,0'
+        println "$preprocess"
     }
 
     def cleanup() {
