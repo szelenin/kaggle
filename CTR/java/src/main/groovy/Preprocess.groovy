@@ -40,7 +40,7 @@ class Preprocess {
 
     }
 
-    def run() {
+    def run(Set compactColumns = [] as Set) {
         def result = [:]
         def columns = [:]
         def writer = outFile.newPrintWriter()
@@ -48,17 +48,24 @@ class Preprocess {
             def outLine = []
             line.split(',').eachWithIndex { String word, int i ->
                 if (number == 1) {
-                    result[word] = [:]
-                    columns[i] = word
-                    outLine+=word
-                } else {
-                    def countIdxTuple = result[columns[i]][word]
-                    if (!countIdxTuple){
-                        countIdxTuple = [0, result[columns[i]].size()]
-                        result[columns[i]][word] = countIdxTuple
+                    if (compactColumns.contains(word)) {
+                        result[word] = [:]
                     }
-                    (countIdxTuple as List)[0]+=1
-                    outLine+=(countIdxTuple as List)[1]
+                    columns[i] = word
+                    outLine += word
+                } else {
+                    String columnName = columns[i]
+                    if (compactColumns.contains(columnName)) {
+                        def countIdxTuple = result[columnName][word]
+                        if (!countIdxTuple) {
+                            countIdxTuple = [0, result[columnName].size()]
+                            result[columnName][word] = countIdxTuple
+                        }
+                        (countIdxTuple as List)[0] += 1
+                        outLine += (countIdxTuple as List)[1]
+                    } else {
+                        outLine += word
+                    }
                 }
             }
             writer.println(StringUtils.join(outLine, ','))

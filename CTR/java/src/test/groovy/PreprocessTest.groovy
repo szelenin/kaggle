@@ -25,7 +25,7 @@ class PreprocessTest extends Specification {
         writeLine('col1')
         writeLine('value')
         when:
-        def structure = this.preprocess.run()
+        def structure = this.preprocess.run(['col1'] as Set)
         def outLines = outFile.readLines()
         then:
         assert structure.col1.value == [1, 0]
@@ -38,7 +38,7 @@ class PreprocessTest extends Specification {
         writeLine('col1,col2')
         writeLine('value1,value2')
         when:
-        def structure = this.preprocess.run()
+        def structure = this.preprocess.run(['col1','col2'] as Set)
         def outLines = outFile.readLines()
         then:
         assert structure.col1.value1 == [1, 0]
@@ -53,7 +53,7 @@ class PreprocessTest extends Specification {
         writeLine('value1')
         writeLine('value2')
         when:
-        def structure = this.preprocess.run()
+        def structure = this.preprocess.run(['col1'] as Set)
         def outLines = outFile.readLines()
         then:
         assert structure.col1.value1 == [1, 0]
@@ -69,7 +69,7 @@ class PreprocessTest extends Specification {
         writeLine('value1,value2')
         writeLine('value1,value3')
         when:
-        def structure = this.preprocess.run()
+        def structure = this.preprocess.run(['col1','col2'] as Set)
         def outLines = outFile.readLines()
         then:
         assert structure.col1.value1 == [2, 0]
@@ -78,6 +78,27 @@ class PreprocessTest extends Specification {
         assert outLines[0] == 'col1,col2'
         assert outLines[1] == '0,0'
         assert outLines[2] == '0,1'
+    }
+
+    def "preprocess only specified cols"(){
+        given:
+        writeLine('col1,col2,col3')
+        writeLine('value1,value2,value3')
+        writeLine('value1,value3,valuex')
+        writeLine('value1,value3,value3')
+        when:
+        def structure = this.preprocess.run(['col2','col3'] as Set)
+        def outLines = outFile.readLines()
+        then:
+        assert structure.col1 == null
+        assert structure.col2.value2 == [1, 0]
+        assert structure.col2.value3 == [2, 1]
+        assert structure.col3.value3 == [2, 0]
+        assert structure.col3.valuex == [1, 1]
+        assert outLines[0] == 'col1,col2,col3'
+        assert outLines[1] == 'value1,0,0'
+        assert outLines[2] == 'value1,1,1'
+        assert outLines[3] == 'value1,1,0'
     }
 
     def cleanup() {
