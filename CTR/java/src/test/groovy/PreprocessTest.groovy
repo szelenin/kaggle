@@ -7,10 +7,29 @@ import spock.lang.Specification
 class PreprocessTest extends Specification {
     private File dir
     def writer
+    def preprocess
+    File outFile
+    File inFile
 
     def setup(){
         dir = File.createTempDir()
-        writer = new File(dir, 'test.csv').newPrintWriter()
+        outFile = new File(dir, 'out.csv')
+        inFile = new File(dir, 'test.csv')
+        writer = inFile.newPrintWriter()
+        preprocess = new Preprocess(inFile: inFile, outFile: outFile)
+    }
+
+    def "simple value replace"() {
+        given:
+        writeLine('col1')
+        writeLine('value')
+        when:
+        def structure = this.preprocess.run()
+        def outLines = outFile.readLines()
+        then:
+        assert structure.col1.value == 1
+        assert outLines[0] == 'col1'
+        assert outLines[1] == '1'
     }
 
     def cleanup() {
@@ -18,16 +37,9 @@ class PreprocessTest extends Specification {
         FileUtils.forceDelete(dir)
     }
 
-    def "simple value replace"() {
-        given:
-        writer.println('col1')
-        writer.println('value')
+    private writeLine(String column) {
+        writer.println(column)
         writer.flush()
-        when:
-        def preprocess = new Preprocess(inFile: new File(dir, 'test.csv'), outFile: new File(dir, 'out.csv'))
-        def structure = preprocess.run()
-        then:
-        assert structure.col1.value == 1
     }
 
 }

@@ -42,15 +42,18 @@ class Preprocess {
     def run() {
         def result =[:]
         def columns = [:]
+        def writer = outFile.newPrintWriter()
         ResourceGroovyMethods.eachLine(inFile){line, number->
             if (number == 1) {
                 result[line]=[:]
                 columns[0]= line
+                writer.println(line)
                 return
             }
-
             result[columns[0]][line] = 1
+            writer.println(1)
         }
+        writer.close()
         result
     }
 }
