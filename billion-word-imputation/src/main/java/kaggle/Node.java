@@ -1,11 +1,14 @@
 package kaggle;
 
+import java.io.Serializable;
 import java.util.*;
 
 /**
  * Created by szelenin on 12/9/2014.
  */
-public class Node {
+public class Node implements Serializable {
+
+    private static final long serialVersionUID = 9073428157928387951L;
     private Map<String, Node> children = new HashMap<String, Node>();
     private int count = 0;
 
