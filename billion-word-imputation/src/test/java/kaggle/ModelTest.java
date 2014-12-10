@@ -11,7 +11,7 @@ import static org.junit.Assert.assertEquals;
 public class ModelTest {
 
     @Test
-    public void shouldInsertFromSentence(){
+    public void shouldInsertFromSentence() {
         Model model = new Model();
         model.put("the dog likes the cat");
 
@@ -21,7 +21,7 @@ public class ModelTest {
     }
 
     @Test
-    public void shouldInsertFromSentenceSpaces(){
+    public void shouldInsertFromSentenceSpaces() {
         Model model = new Model();
         model.put("the   dog  likes the   cat");
 
@@ -31,7 +31,7 @@ public class ModelTest {
     }
 
     @Test
-    public void shouldCountWhenFirstWordRequested(){
+    public void shouldCountWhenFirstWordRequested() {
         Model model = new Model();
         model.put("the dog likes the cat");
 
@@ -40,7 +40,7 @@ public class ModelTest {
     }
 
     @Test
-    public void shouldCountCaseInsensitive(){
+    public void shouldCountCaseInsensitive() {
         Model model = new Model();
         model.put("ThE doG Likes tHe Cat");
 
@@ -50,7 +50,7 @@ public class ModelTest {
     }
 
     @Test
-    public void shouldCountStopWord(){
+    public void shouldCountStopWord() {
         Model model = new Model();
         model.put("the dog likes the cat");
 
@@ -58,7 +58,7 @@ public class ModelTest {
     }
 
     @Test
-    public void shouldSkipNonWords(){
+    public void shouldSkipNonWords() {
         Model model = new Model();
         model.put("the-dog, likes (the) # cat.");
 
@@ -72,15 +72,34 @@ public class ModelTest {
     }
 
     @Test
-    public void shouldSupportNgrams(){
-        Model model = new Model();
+    public void shouldSupportNgrams() {
+        Model model = new Model(3);
         model.put("the dog likes the cat");
         model.put("the cat likes the cat");
 
         assertEquals(2, model.count("*", "*", "the"));
-        assertEquals(1, model.count( "*", "the", "dog"));
-        assertEquals(3, model.count( "*", "the", "cat"));
-        assertEquals(2, model.count( "likes", "the", "cat"));
+        assertEquals(1, model.count("*", "the", "dog"));
+        assertEquals(2, model.count("likes", "the", "cat"));
     }
 
+    @Test
+    public void shouldPutSeveralLines() {
+        Model model = new Model(2);
+        model.put("the dog likes the cat");
+        model.put("the cat likes the cat");
+
+        assertEquals(2, model.count("*", "the"));
+        assertEquals(3, model.count("the", "cat"));
+    }
+
+    @Test
+    public void shouldCountSeveralNGramsAtOnce() {
+        Model model = new Model(2, 3);
+
+        model.put("the dog likes the cat");
+        model.put("the cat likes the cat");
+
+        assertEquals(3, model.count("the", "cat"));
+        assertEquals(2, model.count("likes", "the", "cat"));
+    }
 }
