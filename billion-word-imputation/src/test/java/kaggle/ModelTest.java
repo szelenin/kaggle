@@ -113,6 +113,7 @@ public class ModelTest {
 
         assertEquals(5, model.uniqueWordsCount());
         assertEquals(2, model.sentencesRead());
+        assertEquals(5 + 5, model.totalWords());
     }
 
     @Test

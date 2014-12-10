@@ -20,6 +20,7 @@ public class Model implements Serializable {
     private Map<Integer, NGramCount> nGramCounts;
     private static final Pattern delimiter = Pattern.compile("\\s+|\\W");
     private int sentencesCount = 0;
+    private int totalWords = 0;
 
     public Model() {
         this(2);
@@ -47,6 +48,7 @@ public class Model implements Serializable {
                 continue;
             }
             putWord(word);
+            totalWords++;
         }
         putWord("_stop_");
         sentencesCount++;
@@ -73,5 +75,9 @@ public class Model implements Serializable {
 
     public int sentencesRead() {
         return sentencesCount;
+    }
+
+    public int totalWords() {
+        return totalWords;
     }
 }
