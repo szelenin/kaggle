@@ -11,7 +11,7 @@ public class Model {
     private final Pattern delimiter = Pattern.compile("\\s+");
 
     public void put(String sentence) {
-        Scanner scanner = new Scanner("* " + sentence.toLowerCase());
+        Scanner scanner = new Scanner("* " + sentence.toLowerCase() + " _stop_");
         scanner.useDelimiter(delimiter);
         String word1 = scanner.next();
         while (scanner.hasNext()) {

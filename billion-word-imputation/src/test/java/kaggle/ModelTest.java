@@ -49,5 +49,13 @@ public class ModelTest {
         assertEquals(1, model.count("THe", "cAt"));
     }
 
+    @Test
+    public void shouldCountStopWord(){
+        Model model = new Model();
+        model.put("the dog likes the cat");
+
+        assertEquals(1, model.count("cat", "_stop_"));
+    }
+
 
 }
