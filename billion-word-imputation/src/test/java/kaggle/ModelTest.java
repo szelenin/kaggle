@@ -71,5 +71,16 @@ public class ModelTest {
         assertEquals(1, model.count("cat", "_stop_"));
     }
 
+    @Test
+    public void shouldSupportNgrams(){
+        Model model = new Model();
+        model.put("the dog likes the cat");
+        model.put("the cat likes the cat");
+
+        assertEquals(2, model.count("*", "*", "the"));
+        assertEquals(1, model.count( "*", "the", "dog"));
+        assertEquals(3, model.count( "*", "the", "cat"));
+        assertEquals(2, model.count( "likes", "the", "cat"));
+    }
 
 }

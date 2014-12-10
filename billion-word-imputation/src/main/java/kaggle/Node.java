@@ -1,8 +1,6 @@
 package kaggle;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 
 /**
  * Created by szelenin on 12/9/2014.
@@ -12,18 +10,22 @@ public class Node {
     private int count = 0;
 
     public void put(String ... sentence) {
+        put(Arrays.asList(sentence));
+    }
+
+
+    public void put(List<String> words) {
         Node node = this;
-        for (String word : sentence) {
+        for (String word : words) {
             Node child = node.children.get(word);
             if (child == null) {
                 child = new Node();
             }
-            child.count ++;
+            child.count++;
             node.children.put(word, child);
             node = child;
         }
     }
-
 
     public int getSequenceCount(String... wordSequence) {
         Node node = this;
