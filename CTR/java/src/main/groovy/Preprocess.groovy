@@ -1,3 +1,5 @@
+import org.apache.commons.io.FileUtils
+import org.apache.commons.io.IOUtils
 import org.apache.commons.lang3.StringUtils
 import org.codehaus.groovy.runtime.ResourceGroovyMethods
 
@@ -11,7 +13,17 @@ class Preprocess {
     private int totalRows=0
 
     public static void main(String[] args) {
-        def file = new File('D:\\workspace\\projects\\szelenin\\kaggle\\CTR\\data\\tmp.csv')
+        def inFile = new File('D:\\workspace\\projects\\szelenin\\kaggle\\CTR\\data\\train.csv')
+        def outFile = new File('D:\\workspace\\projects\\szelenin\\kaggle\\CTR\\data\\outTrain.csv')
+//        def inFile = new File('D:\\workspace\\projects\\szelenin\\kaggle\\CTR\\data\\tmp.csv')
+//        def outFile = new File('D:\\workspace\\projects\\szelenin\\kaggle\\CTR\\data\\outtmp.csv')
+
+        def preprocess = new Preprocess(inFile: inFile, outFile: outFile)
+        preprocess.run(['hour', 'C1', 'site_id', 'site_domain', 'site_category', 'app_id', 'app_domain', 'app_category', 'device_id', 'device_ip', 'device_model', 'C14', 'C15', 'C16', 'C20'] as Set)
+        def metadataOut = new ObjectOutputStream(new FileOutputStream('D:\\workspace\\projects\\szelenin\\kaggle\\CTR\\data\\outTrain.ser'))
+        println "$preprocess"
+        metadataOut.writeObject(preprocess.result)
+        metadataOut.close()
     }
 
     def run(Set compactColumns = [] as Set) {
@@ -44,6 +56,9 @@ class Preprocess {
                 }
             }
             totalRows++
+            if (totalRows % 1000 == 0) {
+                println "Processed: $totalRows"
+            }
             writer.println(StringUtils.join(outLine, ','))
         }
         writer.close()

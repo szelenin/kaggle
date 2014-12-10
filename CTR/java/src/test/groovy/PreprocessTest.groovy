@@ -102,6 +102,14 @@ class PreprocessTest extends Specification {
         println "$preprocess"
     }
 
+    def "readtmp"() {
+        when:
+        def object = new ObjectInputStream(new FileInputStream('D:\\workspace\\projects\\szelenin\\kaggle\\CTR\\data\\outTrain.ser')).readObject()
+
+        then:
+        println "object = $object"
+   }
+
     def cleanup() {
         writer.close()
         FileUtils.forceDelete(dir)
