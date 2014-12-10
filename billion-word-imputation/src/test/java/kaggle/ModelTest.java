@@ -57,5 +57,19 @@ public class ModelTest {
         assertEquals(1, model.count("cat", "_stop_"));
     }
 
+    @Test
+    public void shouldSkipNonWords(){
+        Model model = new Model();
+        model.put("the-dog, likes (the) # cat.");
+
+        assertEquals(2, model.count("the"));
+        assertEquals(1, model.count("*", "the"));
+        assertEquals(1, model.count("the", "dog"));
+        assertEquals(1, model.count("dog", "likes"));
+        assertEquals(1, model.count("likes", "the"));
+        assertEquals(1, model.count("the", "cat"));
+        assertEquals(1, model.count("cat", "_stop_"));
+    }
+
 
 }
