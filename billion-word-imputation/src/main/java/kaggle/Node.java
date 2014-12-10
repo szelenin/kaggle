@@ -28,7 +28,7 @@ public class Node {
     public int getSequenceCount(String... wordSequence) {
         Node node = this;
         for (String word : wordSequence) {
-            Node child = node.children.get(word);
+            Node child = node.children.get(word.toLowerCase());
             if (child == null) {
                 return 0;
             }

@@ -1,5 +1,6 @@
 package kaggle;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -18,4 +19,35 @@ public class ModelTest {
         assertEquals(1, model.count("the", "dog"));
         assertEquals(1, model.count("the", "cat"));
     }
+
+    @Test
+    public void shouldInsertFromSentenceSpaces(){
+        Model model = new Model();
+        model.put("the   dog  likes the   cat");
+
+        assertEquals(2, model.count("the"));
+        assertEquals(1, model.count("the", "dog"));
+        assertEquals(1, model.count("the", "cat"));
+    }
+
+    @Test
+    public void shouldCountWhenFirstWordRequested(){
+        Model model = new Model();
+        model.put("the dog likes the cat");
+
+        //* will be a special symbol which denotes beginning of sentence
+        assertEquals(1, model.count("*", "the"));
+    }
+
+    @Test
+    public void shouldCountCaseInsensitive(){
+        Model model = new Model();
+        model.put("ThE doG Likes tHe Cat");
+
+        assertEquals(2, model.count("thE"));
+        assertEquals(1, model.count("The", "dOg"));
+        assertEquals(1, model.count("THe", "cAt"));
+    }
+
+
 }

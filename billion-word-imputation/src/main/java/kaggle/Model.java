@@ -11,7 +11,7 @@ public class Model {
     private final Pattern delimiter = Pattern.compile("\\s+");
 
     public void put(String sentence) {
-        Scanner scanner = new Scanner(sentence);
+        Scanner scanner = new Scanner("* " + sentence.toLowerCase());
         scanner.useDelimiter(delimiter);
         String word1 = scanner.next();
         while (scanner.hasNext()) {
@@ -21,7 +21,7 @@ public class Model {
         }
     }
 
-    public int count(String ... wordSequence) {
+    public int count(String... wordSequence) {
         return rootNode.getSequenceCount(wordSequence);
     }
 
