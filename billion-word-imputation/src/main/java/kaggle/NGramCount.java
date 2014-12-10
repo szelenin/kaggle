@@ -39,4 +39,8 @@ public class NGramCount implements Serializable {
             words.add("*");
         }
     }
+
+    public int rootChildrenCount() {
+        return rootNode.childrenCount();
+    }
 }

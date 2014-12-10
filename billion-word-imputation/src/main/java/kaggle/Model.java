@@ -19,6 +19,7 @@ public class Model implements Serializable {
     private static final long serialVersionUID = 1648607850532636804L;
     private Map<Integer, NGramCount> nGramCounts;
     private static final Pattern delimiter = Pattern.compile("\\s+|\\W");
+    private int sentencesCount = 0;
 
     public Model() {
         this(2);
@@ -48,6 +49,7 @@ public class Model implements Serializable {
             putWord(word);
         }
         putWord("_stop_");
+        sentencesCount++;
     }
 
     private void putWord(String word) {
@@ -65,4 +67,11 @@ public class Model implements Serializable {
     }
 
 
+    public int uniqueWordsCount() {
+        return nGramCounts.values().iterator().next().rootChildrenCount();
+    }
+
+    public int sentencesRead() {
+        return sentencesCount;
+    }
 }

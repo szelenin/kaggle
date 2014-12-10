@@ -41,4 +41,8 @@ public class Node implements Serializable {
         }
         return node.count;
     }
+
+    public int childrenCount() {
+        return children.size();
+    }
 }
