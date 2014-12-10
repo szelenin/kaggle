@@ -24,13 +24,15 @@ public class NGramCount implements Serializable {
     public void put(String word) {
         words.removeFirst();
         words.addLast(word);
-        logger.trace("NGram #{} put word {}", n, word);
+        logger.trace("NGram #{}:{}", n, word);
         assert words.size() == n;
         rootNode.put(words);
     }
 
     public int getCount(String... wordSequence) {
-        return rootNode.getSequenceCount(wordSequence);
+        int sequenceCount = rootNode.getSequenceCount(wordSequence);
+        logger.trace("NGram #{} {}:{}", n, wordSequence, sequenceCount);
+        return sequenceCount;
     }
 
     public void newSentence() {

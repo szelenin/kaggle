@@ -2,6 +2,8 @@ package kaggle;
 
 import org.junit.Test;
 
+import java.io.*;
+
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -111,5 +113,24 @@ public class ModelTest {
 
         assertEquals(5, model.uniqueWordsCount());
         assertEquals(2, model.sentencesRead());
+    }
+
+    @Test
+    public void shouldSerializeModel() throws IOException, ClassNotFoundException {
+        Model model = new Model(2, 3);
+
+        model.put("the dog likes the cat");
+        model.put("the cat likes the cat");
+
+        ByteArrayOutputStream byteArrayOut = new ByteArrayOutputStream();
+        ObjectOutputStream objectOut = new ObjectOutputStream(byteArrayOut);
+        objectOut.writeObject(model);
+
+        Model readModel = (Model) new ObjectInputStream(new ByteArrayInputStream(byteArrayOut.toByteArray())).readObject();
+
+        assertEquals(5, readModel.uniqueWordsCount());
+        assertEquals(2, readModel.sentencesRead());
+        assertEquals(3, model.count("the", "cat"));
+        assertEquals(2, model.count("likes", "the", "cat"));
     }
 }

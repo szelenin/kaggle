@@ -7,10 +7,10 @@
     </Appenders>
 
     <Loggers>
-        <Root level="error">
+        <Root level="info">
             <AppenderRef ref="File"/>
         </Root>
-        <Logger name="kaggle" level="trace">
+        <Logger name="kaggle" level="info" additivity="false">
             <AppenderRef ref="File"/>
         </Logger>
     </Loggers>
