@@ -112,7 +112,7 @@ public class ModelTest {
 
     @Test
     public void shouldProvideStatistic(){
-        Model model = new Model(2, 3);
+        Model model = new Model(3);
 
         model.put("the dog likes the cat");
         model.put("the cat likes the cat");
@@ -124,7 +124,7 @@ public class ModelTest {
 
     @Test
     public void shouldSerializeModel() throws IOException, ClassNotFoundException {
-        Model model = new Model(2, 3);
+        Model model = new Model(3);
 
         model.put("the dog likes the cat");
         model.put("the cat likes the cat");

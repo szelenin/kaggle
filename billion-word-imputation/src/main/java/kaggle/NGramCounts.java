@@ -10,15 +10,15 @@ import java.util.LinkedList;
 /**
  * Created by szelenin on 12/10/2014.
  */
-public class NGramCount implements Serializable {
-    private static final Logger logger = LogManager.getLogger(NGramCount.class);
+public class NGramCounts implements Serializable {
+    private static final Logger logger = LogManager.getLogger(NGramCounts.class);
 
     private static final long serialVersionUID = 1086329126464393222L;
     private Node rootNode = new Node();
     private LinkedList<String> words;
     private int n;
 
-    public NGramCount(int n) {
+    public NGramCounts(int n) {
         this.n = n;
     }
 

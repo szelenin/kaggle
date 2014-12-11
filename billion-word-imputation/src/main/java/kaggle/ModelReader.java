@@ -12,7 +12,7 @@ public class ModelReader {
     private static final Logger logger = LogManager.getLogger(ModelReader.class);
 
     public static void main(String[] args) throws IOException {
-        Model model = new Model(2, 3);
+        Model model = new Model(3);
         BufferedReader reader = new BufferedReader(new FileReader("D:\\workspace\\projects\\szelenin\\kaggle\\billion-word-imputation\\data\\train_v2.txt"));
         String line = reader.readLine();
         while (line != null) {
