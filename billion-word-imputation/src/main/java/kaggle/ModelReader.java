@@ -18,10 +18,11 @@ public class ModelReader {
         while (line != null) {
             model.put(line);
             line = reader.readLine();
-            if (model.sentencesRead() % 100 == 0) {
+            if (model.sentencesRead() % 1000 == 0) {
                 logger.info("Lines read: {}. Unique words: {}, total words: {}", model.sentencesRead(), model.uniqueWordsCount(), model.totalWords());
             }
         }
+        logger.info("Lines read: {}. Unique words: {}, total words: {}", model.sentencesRead(), model.uniqueWordsCount(), model.totalWords());
 
         ObjectOutputStream objectOutputStream = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream("D:\\workspace\\projects\\szelenin\\kaggle\\billion-word-imputation\\data\\model.ser")));
         objectOutputStream.writeObject(model);

@@ -55,4 +55,8 @@ public class NGramCounts implements Serializable {
             rootNode.put(words);
         }
     }
+
+    public int getN() {
+        return n;
+    }
 }

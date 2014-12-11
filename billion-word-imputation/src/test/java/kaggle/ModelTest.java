@@ -117,9 +117,22 @@ public class ModelTest {
         model.put("the dog likes the cat");
         model.put("the cat likes the cat");
 
-        assertEquals(6, model.uniqueWordsCount());
+        assertEquals(5, model.uniqueWordsCount());
         assertEquals(2, model.sentencesRead());
         assertEquals(5 + 5, model.totalWords());
+    }
+
+    @Test
+    public void shouldCalcUnigramOnly(){
+        Model model = new Model(1);
+
+        model.put("the dog likes the cat");
+        model.put("the cat likes the cat");
+
+        assertEquals(5, model.uniqueWordsCount());
+        assertEquals(4, model.count("the"));
+        assertEquals(3, model.count("cat"));
+        assertEquals(0, model.count("the", "cat"));
     }
 
     @Test
@@ -135,7 +148,7 @@ public class ModelTest {
 
         Model readModel = (Model) new ObjectInputStream(new ByteArrayInputStream(byteArrayOut.toByteArray())).readObject();
 
-        assertEquals(6, readModel.uniqueWordsCount());
+        assertEquals(5, readModel.uniqueWordsCount());
         assertEquals(2, readModel.sentencesRead());
         assertEquals(3, model.count("the", "cat"));
         assertEquals(2, model.count("likes", "the", "cat"));

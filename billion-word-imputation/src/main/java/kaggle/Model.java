@@ -56,7 +56,7 @@ public class Model implements Serializable {
 
 
     public int uniqueWordsCount() {
-        return nGramCounts.rootChildrenCount();
+        return nGramCounts.getN() > 1 ? nGramCounts.rootChildrenCount() - 1 : nGramCounts.rootChildrenCount();
     }
 
     public int sentencesRead() {
