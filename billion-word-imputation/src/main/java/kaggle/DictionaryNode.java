@@ -1,23 +1,27 @@
 package kaggle;
 
+import cern.colt.map.OpenIntObjectHashMap;
+
 import java.io.Serializable;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by szelenin on 12/9/2014.
  */
-public class Node implements Serializable {
+public class DictionaryNode implements Serializable {
 
     private static final long serialVersionUID = 9073428157928387951L;
-    private Map<String, Node> children = new HashMap<String, Node>();
+    private OpenIntObjectHashMap children = new OpenIntObjectHashMap();
     private int count = 0;
 
-    public void put(List<String> words) {
-        Node node = this;
-        for (String word : words) {
-            Node child = node.children.get(word);
+    public void put(List<Integer> words) {
+        DictionaryNode node = this;
+        for (Integer word : words) {
+            DictionaryNode child = (DictionaryNode) node.children.get(word);
             if (child == null) {
-                child = new Node();
+                child = new DictionaryNode();
             }
             child.count++;
             node.children.put(word, child);
@@ -26,9 +30,9 @@ public class Node implements Serializable {
     }
 
     public int getSequenceCount(String... wordSequence) {
-        Node node = this;
+        DictionaryNode node = this;
         for (String word : wordSequence) {
-            Node child = node.children.get(word.toLowerCase());
+            DictionaryNode child = (DictionaryNode) node.children.get(Dictionary.getInstance().getWord(word.toLowerCase()));
             if (child == null) {
                 return 0;
             }
