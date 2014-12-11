@@ -51,6 +51,10 @@ public class Model implements Serializable {
             totalWords++;
         }
         putWord("_stop_");
+        for (NGramCount nGramCount : nGramCounts.values()) {
+            nGramCount.finishSentence();
+        }
+
         sentencesCount++;
     }
 

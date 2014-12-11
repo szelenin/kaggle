@@ -4,6 +4,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.Serializable;
+import java.util.Iterator;
 import java.util.LinkedList;
 
 /**
@@ -44,5 +45,14 @@ public class NGramCount implements Serializable {
 
     public int rootChildrenCount() {
         return rootNode.childrenCount();
+    }
+
+    public void finishSentence() {
+        Iterator<String> iterator = words.iterator();
+        while (iterator.hasNext()) {
+            iterator.next();
+            iterator.remove();
+            rootNode.put(words);
+        }
     }
 }

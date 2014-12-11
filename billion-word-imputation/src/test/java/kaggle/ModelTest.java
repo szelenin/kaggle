@@ -54,8 +54,9 @@ public class ModelTest {
     public void shouldCountStopWord() {
         Model model = new Model();
         model.put("the dog likes the cat");
+        model.put("the cow hates the cat");
 
-        assertEquals(1, model.count("cat", "_stop_"));
+        assertEquals(2, model.count("cat", "_stop_"));
     }
 
     @Test
@@ -95,11 +96,16 @@ public class ModelTest {
 
     @Test
     public void shouldCountSeveralNGramsAtOnce() {
-        Model model = new Model(2, 3);
+        Model model = new Model(3);
 
         model.put("the dog likes the cat");
         model.put("the cat likes the cat");
 
+        assertEquals(2, model.count("cat", "_stop_"));
+        assertEquals(2, model.count("*", "the"));
+        assertEquals(2, model.count("*", "*", "the"));
+        assertEquals(2, model.count("the", "cat", "_stop_"));
+        assertEquals(4, model.count("the"));
         assertEquals(3, model.count("the", "cat"));
         assertEquals(2, model.count("likes", "the", "cat"));
     }
@@ -111,7 +117,7 @@ public class ModelTest {
         model.put("the dog likes the cat");
         model.put("the cat likes the cat");
 
-        assertEquals(5, model.uniqueWordsCount());
+        assertEquals(6, model.uniqueWordsCount());
         assertEquals(2, model.sentencesRead());
         assertEquals(5 + 5, model.totalWords());
     }
@@ -129,7 +135,7 @@ public class ModelTest {
 
         Model readModel = (Model) new ObjectInputStream(new ByteArrayInputStream(byteArrayOut.toByteArray())).readObject();
 
-        assertEquals(5, readModel.uniqueWordsCount());
+        assertEquals(6, readModel.uniqueWordsCount());
         assertEquals(2, readModel.sentencesRead());
         assertEquals(3, model.count("the", "cat"));
         assertEquals(2, model.count("likes", "the", "cat"));

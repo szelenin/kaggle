@@ -19,7 +19,7 @@ public class ModelReader {
             model.put(line);
             line = reader.readLine();
             if (model.sentencesRead() % 100 == 0) {
-                logger.info("Lines read: {}. Unique words {}", model.sentencesRead(), model.uniqueWordsCount());
+                logger.info("Lines read: {}. Unique words: {}, total words: {}", model.sentencesRead(), model.uniqueWordsCount(), model.totalWords());
             }
         }
 
