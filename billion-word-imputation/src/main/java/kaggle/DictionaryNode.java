@@ -1,7 +1,5 @@
 package kaggle;
 
-import cern.colt.map.OpenIntObjectHashMap;
-
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
@@ -13,7 +11,7 @@ import java.util.Map;
 public class DictionaryNode implements Serializable {
 
     private static final long serialVersionUID = 9073428157928387951L;
-    private OpenIntObjectHashMap children = new OpenIntObjectHashMap();
+    private Map<Integer, DictionaryNode> children = new HashMap<Integer, DictionaryNode>();
     private int count = 0;
 
     public void put(List<Integer> words) {
@@ -32,7 +30,7 @@ public class DictionaryNode implements Serializable {
     public int getSequenceCount(String... wordSequence) {
         DictionaryNode node = this;
         for (String word : wordSequence) {
-            DictionaryNode child = (DictionaryNode) node.children.get(Dictionary.getInstance().getWord(word.toLowerCase()));
+            DictionaryNode child = node.children.get(Dictionary.getInstance().getWord(word.toLowerCase()));
             if (child == null) {
                 return 0;
             }
