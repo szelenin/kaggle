@@ -10,15 +10,12 @@ public class Node implements Serializable {
 
     private static final long serialVersionUID = 9073428157928387951L;
     private Map<String, Node> children;
-    private int count = 0;
+    private Integer count;
 
     public void put(List<String> words) {
-        if (children == null) {
-            children = new HashMap<String, Node>();
-        }
         Node node = this;
         for (String word : words) {
-            node = node.addChild(word);
+            node = node.addChild(word.intern());
         }
     }
 
@@ -26,6 +23,7 @@ public class Node implements Serializable {
         Node child = getChild(word);
         if (child == null) {
             child = new Node();
+            child.count = 0;
         }
         child.count++;
         if (children == null) {
