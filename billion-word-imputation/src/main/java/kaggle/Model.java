@@ -1,5 +1,9 @@
 package kaggle;
 
+import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.KryoSerializable;
+import com.esotericsoftware.kryo.io.Input;
+import com.esotericsoftware.kryo.io.Output;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -11,7 +15,7 @@ import java.util.regex.Pattern;
 /**
  * Created by szelenin on 12/9/2014.
  */
-public class Model implements Serializable {
+public class Model implements Serializable, KryoSerializable {
     private static final Logger logger = LogManager.getLogger(Model.class);
 
     private static final long serialVersionUID = 1648607850532636804L;
@@ -65,5 +69,20 @@ public class Model implements Serializable {
 
     public int totalWords() {
         return totalWords;
+    }
+
+    @Override
+    public void write(Kryo kryo, Output output) {
+        kryo.writeObject(output, nGramCounts);
+        kryo.writeObject(output, sentencesCount);
+        kryo.writeObject(output, totalWords);
+    }
+
+    @Override
+    public void read(Kryo kryo, Input input) {
+        nGramCounts = kryo.readObject(input, NGramCounts.class);
+        sentencesCount = kryo.readObject(input, int.class);
+        totalWords = kryo.readObject(input, int.class);
+
     }
 }

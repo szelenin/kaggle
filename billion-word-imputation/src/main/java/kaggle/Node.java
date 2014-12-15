@@ -1,12 +1,17 @@
 package kaggle;
 
+import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.KryoSerializable;
+import com.esotericsoftware.kryo.io.Input;
+import com.esotericsoftware.kryo.io.Output;
+
 import java.io.Serializable;
 import java.util.*;
 
 /**
  * Created by szelenin on 12/9/2014.
  */
-public class Node implements Serializable {
+public class Node implements Serializable, KryoSerializable {
 
     private static final long serialVersionUID = 9073428157928387951L;
     private Map<String, Node> children;
@@ -54,5 +59,17 @@ public class Node implements Serializable {
 
     public int childrenCount() {
         return children.size();
+    }
+
+    @Override
+    public void write(Kryo kryo, Output output) {
+        kryo.writeObjectOrNull(output, children, HashMap.class);
+        kryo.writeObjectOrNull(output, count, int.class);
+    }
+
+    @Override
+    public void read(Kryo kryo, Input input) {
+        children = kryo.readObjectOrNull(input, HashMap.class);
+        count = kryo.readObjectOrNull(input, int.class);
     }
 }

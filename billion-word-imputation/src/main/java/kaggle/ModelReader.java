@@ -1,5 +1,7 @@
 package kaggle;
 
+import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.io.Output;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -45,8 +47,8 @@ public class ModelReader {
         }
         trainPartOut.close();
         testPartOut.close();
-        logger.info("Writing model, part {} ...", currentPart+1);
-        writeModel(model, currentPart+1);
+        logger.info("Writing model, part {} ...", currentPart + 1);
+        writeModel(model, currentPart + 1);
         logger.info("Model written.");
         logger.info("Lines read: {}. Unique words: {}, total words: {}", model.sentencesRead(), model.uniqueWordsCount(), model.totalWords());
 /*
@@ -69,11 +71,19 @@ public class ModelReader {
     }
 
     private static void writeModel(Model model, int currentPart) throws IOException {
-        ObjectOutputStream objectOutputStream = new ObjectOutputStream(new BufferedOutputStream(
+        Kryo kryo = new Kryo();
+        BufferedOutputStream out = new BufferedOutputStream(
                 new FileOutputStream(
-                        "D:\\workspace\\projects\\szelenin\\kaggle\\billion-word-imputation\\data\\model" + currentPart + ".ser")));
+                        "D:\\workspace\\projects\\szelenin\\kaggle\\billion-word-imputation\\data\\model" + currentPart + ".kryo"));
+        Output kryoOut = new Output(out);
+        kryo.writeObject(kryoOut, model);
+        kryoOut.close();
+/*
+
+        ObjectOutputStream objectOutputStream = new ObjectOutputStream(out);
         objectOutputStream.writeObject(model);
         objectOutputStream.close();
+*/
     }
 
     private static PrintWriter createPartOutStream(int currentPart, String suffix) throws FileNotFoundException {
