@@ -15,29 +15,57 @@ public class ModelReader {
         Model model = new Model(3);
         int currentPart = 1;
         int totalSentences = 30301028;
-        int totalParts = 10;
+        int totalParts = 12;
         BufferedReader reader = new BufferedReader(new FileReader("D:\\workspace\\projects\\szelenin\\kaggle\\billion-word-imputation\\data\\train_v2.txt"));
-        PrintWriter partOut = createPartOutStream(currentPart);
+        PrintWriter trainPartOut = createPartOutStream(currentPart, "train");
+        PrintWriter testPartOut = createPartOutStream(currentPart, "test");
         String line = reader.readLine();
         while (line != null) {
             model.put(line);
             line = reader.readLine();
-            partOut.println(line);
+            if (Math.random() > 0.1) {
+                trainPartOut.println(line);
+            }else{
+                testPartOut.println(line);
+            }
             if (model.sentencesRead() % 1000 == 0) {
                 logger.info("Lines read: {}. Unique words: {}, total words: {}", model.sentencesRead(), model.uniqueWordsCount(), model.totalWords());
             }
             if (model.sentencesRead() > totalSentences / totalParts && currentPart < totalParts) {
+                trainPartOut.close();
+                testPartOut.close();
+                logger.info("Writing model, part {} ...", currentPart);
                 writeModel(model, currentPart);
-                partOut.close();
+                logger.info("Model written.");
                 currentPart++;
-                partOut = createPartOutStream(currentPart);
+                trainPartOut = createPartOutStream(currentPart, "train");
+                testPartOut = createPartOutStream(currentPart, "test");
                 model = new Model(3);
             }
         }
-        partOut.close();
+        trainPartOut.close();
+        testPartOut.close();
+        logger.info("Writing model, part {} ...", currentPart+1);
         writeModel(model, currentPart+1);
+        logger.info("Model written.");
         logger.info("Lines read: {}. Unique words: {}, total words: {}", model.sentencesRead(), model.uniqueWordsCount(), model.totalWords());
-
+/*
+        Model model = new Model(3);
+        int currentPart = 1;
+        int totalSentences = 30301028;
+        int totalParts = 10;
+        BufferedReader reader = new BufferedReader(new FileReader("D:\\workspace\\projects\\szelenin\\kaggle\\billion-word-imputation\\data\\train_part_4.txt"));
+        String line = reader.readLine();
+        while (line != null) {
+            model.put(line);
+            line = reader.readLine();
+            if (model.sentencesRead() % 1000 == 0) {
+                logger.info("Lines read: {}. Unique words: {}, total words: {}", model.sentencesRead(), model.uniqueWordsCount(), model.totalWords());
+            }
+        }
+        writeModel(model, 4);
+        logger.info("Lines read: {}. Unique words: {}, total words: {}", model.sentencesRead(), model.uniqueWordsCount(), model.totalWords());
+*/
     }
 
     private static void writeModel(Model model, int currentPart) throws IOException {
@@ -48,9 +76,11 @@ public class ModelReader {
         objectOutputStream.close();
     }
 
-    private static PrintWriter createPartOutStream(int currentPart) throws FileNotFoundException {
+    private static PrintWriter createPartOutStream(int currentPart, String suffix) throws FileNotFoundException {
         try {
-            return new PrintWriter(new BufferedWriter(new FileWriter("D:\\workspace\\projects\\szelenin\\kaggle\\billion-word-imputation\\data\\train_part_" + currentPart + ".txt")));
+            return new PrintWriter(new BufferedWriter(new FileWriter("D:\\workspace\\projects\\szelenin\\kaggle\\billion-word-imputation\\data\\" +
+                    suffix +
+                    "_part_" + currentPart + ".txt")));
         } catch (IOException e) {
             e.printStackTrace();
         }

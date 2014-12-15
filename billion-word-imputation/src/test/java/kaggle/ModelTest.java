@@ -1,5 +1,8 @@
 package kaggle;
 
+import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.io.Input;
+import com.esotericsoftware.kryo.io.Output;
 import org.junit.Test;
 
 import java.io.*;
@@ -147,6 +150,30 @@ public class ModelTest {
         objectOut.writeObject(model);
 
         Model readModel = (Model) new ObjectInputStream(new ByteArrayInputStream(byteArrayOut.toByteArray())).readObject();
+
+        assertEquals(5, readModel.uniqueWordsCount());
+        assertEquals(2, readModel.sentencesRead());
+        assertEquals(3, model.count("the", "cat"));
+        assertEquals(2, model.count("likes", "the", "cat"));
+    }
+
+    @Test
+    public void shouldSerializeModelWithKryo() throws IOException, ClassNotFoundException {
+        Model model = new Model(3);
+
+        model.put("the dog likes the cat");
+        model.put("the cat likes the cat");
+
+        ByteArrayOutputStream byteArrayOut = new ByteArrayOutputStream();
+        Kryo kryo = new Kryo();
+        Output output = new Output(byteArrayOut);
+        kryo.writeObject(output, model);
+        output.close();
+
+        Input input = new Input(new ByteArrayInputStream(byteArrayOut.toByteArray()));
+
+        Model readModel = kryo.readObject(input, Model.class);
+        input.close();
 
         assertEquals(5, readModel.uniqueWordsCount());
         assertEquals(2, readModel.sentencesRead());
