@@ -13,19 +13,47 @@ public class ModelReader {
 
     public static void main(String[] args) throws IOException {
         Model model = new Model(3);
+        int currentPart = 1;
+        int totalSentences = 30301028;
+        int totalParts = 10;
         BufferedReader reader = new BufferedReader(new FileReader("D:\\workspace\\projects\\szelenin\\kaggle\\billion-word-imputation\\data\\train_v2.txt"));
+        PrintWriter partOut = createPartOutStream(currentPart);
         String line = reader.readLine();
         while (line != null) {
             model.put(line);
             line = reader.readLine();
+            partOut.println(line);
             if (model.sentencesRead() % 1000 == 0) {
                 logger.info("Lines read: {}. Unique words: {}, total words: {}", model.sentencesRead(), model.uniqueWordsCount(), model.totalWords());
             }
+            if (model.sentencesRead() > totalSentences / totalParts && currentPart < totalParts) {
+                writeModel(model, currentPart);
+                partOut.close();
+                currentPart++;
+                partOut = createPartOutStream(currentPart);
+                model = new Model(3);
+            }
         }
+        partOut.close();
+        writeModel(model, currentPart+1);
         logger.info("Lines read: {}. Unique words: {}, total words: {}", model.sentencesRead(), model.uniqueWordsCount(), model.totalWords());
 
-        ObjectOutputStream objectOutputStream = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream("D:\\workspace\\projects\\szelenin\\kaggle\\billion-word-imputation\\data\\model.ser")));
+    }
+
+    private static void writeModel(Model model, int currentPart) throws IOException {
+        ObjectOutputStream objectOutputStream = new ObjectOutputStream(new BufferedOutputStream(
+                new FileOutputStream(
+                        "D:\\workspace\\projects\\szelenin\\kaggle\\billion-word-imputation\\data\\model" + currentPart + ".ser")));
         objectOutputStream.writeObject(model);
         objectOutputStream.close();
+    }
+
+    private static PrintWriter createPartOutStream(int currentPart) throws FileNotFoundException {
+        try {
+            return new PrintWriter(new BufferedWriter(new FileWriter("D:\\workspace\\projects\\szelenin\\kaggle\\billion-word-imputation\\data\\train_part_" + currentPart + ".txt")));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }
