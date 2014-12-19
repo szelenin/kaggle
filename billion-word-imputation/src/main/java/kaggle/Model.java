@@ -9,6 +9,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 
@@ -33,8 +35,7 @@ public class Model implements Serializable, KryoSerializable {
     }
 
     public void put(String sentence) {
-        Scanner scanner = new Scanner(sentence.toLowerCase());
-        scanner.useDelimiter(delimiter);
+        Scanner scanner = createScanner(sentence);
         logger.trace("Starting sentence: {}", sentence);
 
         nGramCounts.newSentence();
@@ -51,6 +52,12 @@ public class Model implements Serializable, KryoSerializable {
         nGramCounts.finishSentence();
 
         sentencesCount++;
+    }
+
+    private Scanner createScanner(String sentence) {
+        Scanner scanner = new Scanner(sentence.toLowerCase());
+        scanner.useDelimiter(delimiter);
+        return scanner;
     }
 
 
@@ -84,5 +91,33 @@ public class Model implements Serializable, KryoSerializable {
         sentencesCount = kryo.readObject(input, int.class);
         totalWords = kryo.readObject(input, int.class);
 
+    }
+
+    public String predict(String sentence) {
+        Scanner scanner = createScanner(sentence);
+        int n = nGramCounts.getN();
+        SentenceCounts sentenceCounts = new SentenceCounts(n);
+
+        List<NGram> nGrams = new ArrayList<>();
+
+        int currentWord = 0;
+
+        for (int i = n; i > 0; i--) {
+            NGram nGram = new NGram(i);
+            nGram.newSentence();
+            nGrams.add(nGram);
+        }
+
+        while (scanner.hasNext()) {
+            String word = scanner.next();
+            if (StringUtils.isBlank(word)) {
+                continue;
+            }
+            for (NGram nGram : nGrams) {
+                sentenceCounts.add(0, word, nGram.getN(), nGramCounts.getCount(nGram.getWords()));
+            }
+        }
+        sentenceCounts.minLikelihoodWordNumber();
+        return null;
     }
 }

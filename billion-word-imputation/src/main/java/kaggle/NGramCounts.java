@@ -8,8 +8,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Created by szelenin on 12/10/2014.
@@ -18,33 +19,32 @@ public class NGramCounts implements Serializable, KryoSerializable {
     private static final Logger logger = LogManager.getLogger(NGramCounts.class);
 
     private static final long serialVersionUID = 1086329126464393222L;
+    private transient final NGram nGram;
     private Node rootNode = new Node();
-    private transient LinkedList<String> words;
     private int n;
 
     public NGramCounts(int n) {
         this.n = n;
+        nGram = new NGram(n);
     }
 
     public void put(String word) {
-        words.removeFirst();
-        words.addLast(word);
-        logger.trace("NGram #{}:{}", n, word);
-        assert words.size() == n;
-        rootNode.put(words);
+        nGram.put(word);
+        rootNode.put(nGram.getWords());
     }
 
-    public int getCount(String... wordSequence) {
+    public int getCount(List<String> wordSequence) {
         int sequenceCount = rootNode.getSequenceCount(wordSequence);
         logger.trace("NGram #{} {}:{}", n, wordSequence, sequenceCount);
         return sequenceCount;
     }
 
+    public int getCount(String... wordSequence) {
+        return getCount(Arrays.asList(wordSequence));
+    }
+
     public void newSentence() {
-        words = new LinkedList<String>();
-        for (int i = 0; i < n; i++) {
-            words.add("*");
-        }
+        nGram.newSentence();
     }
 
     public int rootChildrenCount() {
@@ -52,12 +52,7 @@ public class NGramCounts implements Serializable, KryoSerializable {
     }
 
     public void finishSentence() {
-        Iterator<String> iterator = words.iterator();
-        while (iterator.hasNext()) {
-            iterator.next();
-            iterator.remove();
-            rootNode.put(words);
-        }
+        nGram.finishSentence((List<String> words) -> rootNode.put(words));
     }
 
     public int getN() {

@@ -3,6 +3,7 @@ package kaggle;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.*;
@@ -179,5 +180,15 @@ public class ModelTest {
         assertEquals(2, readModel.sentencesRead());
         assertEquals(3, model.count("the", "cat"));
         assertEquals(2, model.count("likes", "the", "cat"));
+    }
+
+    @Test
+    @Ignore
+    public void shouldPredict(){
+        Model model = new Model(3);
+        model.put("the dog likes the cat");
+        model.put("the cat hates the dog");
+
+        assertEquals("the cat hates the dog", model.predict("the hates the dog"));
     }
 }

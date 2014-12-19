@@ -12,6 +12,7 @@ import java.io.*;
  */
 public class ModelReader {
     private static final Logger logger = LogManager.getLogger(ModelReader.class);
+    private static final Kryo kryo = new Kryo();
 
     public static void main(String[] args) throws IOException {
         Model model = new Model(3);
@@ -48,7 +49,7 @@ public class ModelReader {
         trainPartOut.close();
         testPartOut.close();
         logger.info("Writing model, part {} ...", currentPart + 1);
-        writeModel(model, currentPart + 1);
+        writeModel(model, currentPart);
         logger.info("Model written.");
         logger.info("Lines read: {}. Unique words: {}, total words: {}", model.sentencesRead(), model.uniqueWordsCount(), model.totalWords());
 /*
@@ -71,7 +72,6 @@ public class ModelReader {
     }
 
     private static void writeModel(Model model, int currentPart) throws IOException {
-        Kryo kryo = new Kryo();
         BufferedOutputStream out = new BufferedOutputStream(
                 new FileOutputStream(
                         "D:\\workspace\\projects\\szelenin\\kaggle\\billion-word-imputation\\data\\model" + currentPart + ".kryo"));

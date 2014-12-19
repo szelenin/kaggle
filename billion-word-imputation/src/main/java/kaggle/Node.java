@@ -45,7 +45,7 @@ public class Node implements Serializable, KryoSerializable {
         return children.get(word);
     }
 
-    public int getSequenceCount(String... wordSequence) {
+    public int getSequenceCount(List<String> wordSequence) {
         Node node = this;
         for (String word : wordSequence) {
             Node child = node.children == null ? null : node.children.get(word.toLowerCase());
@@ -55,6 +55,10 @@ public class Node implements Serializable, KryoSerializable {
             node = child;
         }
         return node.count;
+    }
+
+    public int getSequenceCount(String... wordSequence) {
+        return getSequenceCount(Arrays.asList(wordSequence));
     }
 
     public int childrenCount() {
