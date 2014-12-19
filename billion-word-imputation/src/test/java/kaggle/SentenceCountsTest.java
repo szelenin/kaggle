@@ -35,8 +35,8 @@ public class SentenceCountsTest {
         SentenceCounts sentenceCount = new SentenceCounts(3);
 
         addWord(sentenceCount, 0, "the", 4, 2, 2);
-        addWord(sentenceCount, 1, "hates", 1, 1, 0);
-        addWord(sentenceCount, 2, "the", 4, 0, 0);
+        addWord(sentenceCount, 1, "hates", 1, 0, 0);
+        addWord(sentenceCount, 2, "the", 4, 1, 0);
         addWord(sentenceCount, 3, "dog", 2, 2, 0);
 
         assertEquals(1, sentenceCount.minLikelihoodWordNumber());

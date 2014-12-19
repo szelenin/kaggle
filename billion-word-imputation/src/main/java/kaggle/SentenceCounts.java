@@ -12,7 +12,7 @@ public class SentenceCounts {
 
 
     public SentenceCounts(int maxNgramLength) {
-        assert maxNgramLength >=2;
+        assert maxNgramLength >= 2;
         this.maxNgramLength = maxNgramLength;
     }
 
@@ -21,7 +21,7 @@ public class SentenceCounts {
         double minLogLikelihood = Double.MAX_VALUE;
         int counter = 0;
         for (WordCount wordCount : wordCounts.values()) {
-            double logLikelihood = wordCount.nGramLogLikelihood(maxNgramLength);
+            double logLikelihood = wordCount.weighedNGramLogLikelihood(maxNgramLength);
             if (logLikelihood < minLogLikelihood) {
                 minLogLikelihood = logLikelihood;
                 minLikelihoodWordNumber = counter;
@@ -59,7 +59,15 @@ public class SentenceCounts {
             if (nGramCounts[n - 1] == 0 || nGramCounts[n - 2] == 0) {
                 return -Double.MAX_VALUE;
             }
-            return Math.log(nGramCounts[n - 1] / nGramCounts[n - 2]);
+            return Math.log((double) nGramCounts[n - 1] / nGramCounts[n - 2]);
+        }
+
+        public double weighedNGramLogLikelihood(int n) {
+            double weighedNGramLogLikelihood = 0;
+            for (int i = n; i >= 2; i--) {
+                weighedNGramLogLikelihood += nGramLogLikelihood(i);
+            }
+            return weighedNGramLogLikelihood / (maxNgramLength - 1);
         }
     }
 }
