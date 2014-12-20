@@ -70,4 +70,8 @@ public class NGramCounts implements Serializable, KryoSerializable {
         rootNode = kryo.readObject(input, Node.class);
         n = kryo.readObject(input, int.class);
     }
+
+    public String getMaxMostFrequentWordAfter(String ... wordSequence) {
+        return rootNode.getNode(Arrays.asList(wordSequence)).mostFrequentChild();
+    }
 }

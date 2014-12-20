@@ -46,15 +46,23 @@ public class Node implements Serializable, KryoSerializable {
     }
 
     public int getSequenceCount(List<String> wordSequence) {
+        Node node = getNode(wordSequence);
+        if (node == null) {
+            return 0;
+        }
+        return node.count;
+    }
+
+    public Node getNode(List<String> wordSequence) {
         Node node = this;
         for (String word : wordSequence) {
             Node child = node.children == null ? null : node.children.get(word.toLowerCase());
             if (child == null) {
-                return 0;
+                return null;
             }
             node = child;
         }
-        return node.count;
+        return node;
     }
 
     public int getSequenceCount(String... wordSequence) {
@@ -75,5 +83,17 @@ public class Node implements Serializable, KryoSerializable {
     public void read(Kryo kryo, Input input) {
         children = kryo.readObjectOrNull(input, HashMap.class);
         count = kryo.readObjectOrNull(input, int.class);
+    }
+
+    public String mostFrequentChild() {
+        int maxCounter = Integer.MIN_VALUE;
+        String word = null;
+        for (Map.Entry<String, Node> entry : children.entrySet()) {
+            if (entry.getValue().count > maxCounter) {
+                maxCounter = entry.getValue().count;
+                word = entry.getKey();
+            }
+        }
+        return word;
     }
 }
