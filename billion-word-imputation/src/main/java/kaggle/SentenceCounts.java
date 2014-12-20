@@ -1,7 +1,6 @@
 package kaggle;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by szelenin on 12/17/2014.
@@ -39,6 +38,18 @@ public class SentenceCounts {
         }
         wordCount.incrementCount(n, count);
         wordCounts.put(position, wordCount);
+    }
+
+    public List<String> getWordsBefore(int wordNumber) {
+        LinkedList<String> result = new LinkedList<>();
+        int count = maxNgramLength;
+        for (int i = wordNumber - 1; i >= 0 & count-- > 0; i--) {
+            result.addFirst(wordCounts.get(i).word);
+        }
+        for (int i = count; i >= 0; i--) {
+            result.addFirst("*");
+        }
+        return result;
     }
 
     private class WordCount {

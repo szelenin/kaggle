@@ -114,10 +114,12 @@ public class Model implements Serializable, KryoSerializable {
                 continue;
             }
             for (NGram nGram : nGrams) {
-                sentenceCounts.add(0, word, nGram.getN(), nGramCounts.getCount(nGram.getWords()));
+                sentenceCounts.add(currentWord, word, nGram.getN(), nGramCounts.getCount(nGram.getWords()));
             }
+            currentWord++;
         }
-        sentenceCounts.minLikelihoodWordNumber();
+        int wordNumber = sentenceCounts.minLikelihoodWordNumber();
+        sentenceCounts.getWordsBefore(wordNumber);
         return null;
     }
 }

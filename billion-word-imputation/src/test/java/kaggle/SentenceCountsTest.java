@@ -2,6 +2,7 @@ package kaggle;
 
 import org.junit.Test;
 
+import static org.fest.assertions.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 
 public class SentenceCountsTest {
@@ -40,6 +41,7 @@ public class SentenceCountsTest {
         addWord(sentenceCount, 3, "dog", 2, 2, 0);
 
         assertEquals(1, sentenceCount.minLikelihoodWordNumber());
+        assertThat(sentenceCount.getWordsBefore(1)).containsExactly("*", "*", "the");
     }
 
     private void addWord(SentenceCounts sentenceCount, int position, String word, int... nGramCounts) {

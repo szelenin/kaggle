@@ -183,7 +183,6 @@ public class ModelTest {
     }
 
     @Test
-    @Ignore
     public void shouldPredict(){
         Model model = new Model(3);
         model.put("the dog likes the cat");
