@@ -98,7 +98,9 @@ public class Model implements Serializable, KryoSerializable {
         Sentence sentence = new Sentence(sentenceWords);
         sentence.iterateWords(pair -> {
             for (NGram nGram : nGrams) {
-                sentenceCounts.add(pair.getValue1(), pair.getValue0(), nGram.getN(), nGramCounts.getCount(nGram.getWords()));
+                String word = pair.getValue0();
+                nGram.put(word);
+                sentenceCounts.add(pair.getValue1(), word, nGram.getN(), nGramCounts.getCount(nGram.getWords()));
             }
         });
 
@@ -106,7 +108,7 @@ public class Model implements Serializable, KryoSerializable {
         List<String> nGramBefore = sentenceCounts.getWordsBefore(wordNumber);
 
         String mostFrequentWord = nGramCounts.getMaxMostFrequentWordAfter(nGramBefore.subList(1, nGramBefore.size()));
-
-        return null;
+        sentence.putWord(mostFrequentWord, wordNumber);
+        return sentence.toString();
     }
 }
