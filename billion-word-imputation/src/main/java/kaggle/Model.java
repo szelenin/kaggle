@@ -7,6 +7,8 @@ import com.esotericsoftware.kryo.io.Output;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.javatuples.Pair;
+import org.javatuples.Tuple;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -34,32 +36,20 @@ public class Model implements Serializable, KryoSerializable {
         nGramCounts = new NGramCounts(n);
     }
 
-    public void put(String sentence) {
-        Scanner scanner = createScanner(sentence);
-        logger.trace("Starting sentence: {}", sentence);
+    public void put(String sentenceWords) {
+        logger.trace("Starting sentenceWords: {}", sentenceWords);
 
         nGramCounts.newSentence();
-
-        while (scanner.hasNext()) {
-            String word = scanner.next();
-            if (StringUtils.isBlank(word)) {
-                continue;
-            }
-            nGramCounts.put(word);
+        Sentence sentence = new Sentence(sentenceWords);
+        sentence.iterateWords(word -> {
+            nGramCounts.put(word.getValue0());
             totalWords++;
-        }
+        });
         nGramCounts.put("_stop_");
         nGramCounts.finishSentence();
 
         sentencesCount++;
     }
-
-    private Scanner createScanner(String sentence) {
-        Scanner scanner = new Scanner(sentence.toLowerCase());
-        scanner.useDelimiter(delimiter);
-        return scanner;
-    }
-
 
     public int count(String... wordSequence) {
         return nGramCounts.getCount(wordSequence);
@@ -93,14 +83,11 @@ public class Model implements Serializable, KryoSerializable {
 
     }
 
-    public String predict(String sentence) {
-        Scanner scanner = createScanner(sentence);
+    public String predict(String sentenceWords) {
         int n = nGramCounts.getN();
         SentenceCounts sentenceCounts = new SentenceCounts(n);
 
         List<NGram> nGrams = new ArrayList<>();
-
-        int currentWord = 0;
 
         for (int i = n; i > 0; i--) {
             NGram nGram = new NGram(i);
@@ -108,19 +95,18 @@ public class Model implements Serializable, KryoSerializable {
             nGrams.add(nGram);
         }
 
-        while (scanner.hasNext()) {
-            String word = scanner.next();
-            if (StringUtils.isBlank(word)) {
-                continue;
-            }
+        Sentence sentence = new Sentence(sentenceWords);
+        sentence.iterateWords(pair -> {
             for (NGram nGram : nGrams) {
-                sentenceCounts.add(currentWord, word, nGram.getN(), nGramCounts.getCount(nGram.getWords()));
+                sentenceCounts.add(pair.getValue1(), pair.getValue0(), nGram.getN(), nGramCounts.getCount(nGram.getWords()));
             }
-            currentWord++;
-        }
+        });
+
         int wordNumber = sentenceCounts.minLikelihoodWordNumber();
         List<String> nGramBefore = sentenceCounts.getWordsBefore(wordNumber);
-        nGramCounts.getCount(nGramBefore);
+
+        String mostFrequentWord = nGramCounts.getMaxMostFrequentWordAfter(nGramBefore.subList(1, nGramBefore.size()));
+
         return null;
     }
 }
