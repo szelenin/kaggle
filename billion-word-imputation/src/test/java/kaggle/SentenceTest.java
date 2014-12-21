@@ -16,6 +16,7 @@ public class SentenceTest {
         sentence.iterateWords(word->words.addLast(word.getValue0()));
 
         assertThat(words).containsExactly("the","dog","likes","the","cat");
+        assertEquals(5, sentence.wordsCount());
     }
 
     @Test
@@ -25,6 +26,7 @@ public class SentenceTest {
         sentence.iterateWords(word->words.addLast(word.getValue0()));
 
         assertThat(words).containsExactly("the","dog","likes","the","cat");
+        assertEquals(5, sentence.wordsCount());
     }
 
     @Test
@@ -33,6 +35,7 @@ public class SentenceTest {
         sentence.iterateWords(pair->{});
 
         assertEquals("The,dog . Put!some cakes", sentence.toString());
+        assertEquals(5, sentence.wordsCount());
     }
 
     @Test
@@ -51,6 +54,7 @@ public class SentenceTest {
         sentence.putWord("beautiful", 4);
 
         assertEquals("The,dog . Put!some beautiful cakes", sentence.toString());
+        assertEquals(6, sentence.wordsCount());
     }
 
     @Test
@@ -61,6 +65,7 @@ public class SentenceTest {
         sentence.putWord("beautiful", 0);
 
         assertEquals("beautiful The,dog . Put!some cakes", sentence.toString());
+        assertEquals(6, sentence.wordsCount());
     }
 
     @Test
@@ -81,5 +86,24 @@ public class SentenceTest {
         sentence.putWord("beautiful", 5);
 
         assertEquals("The,dog . Put!some cakes beautiful .", sentence.toString());
+    }
+
+    @Test
+    public void shouldRemoveWord(){
+        Sentence sentence = new Sentence("The,dog . Put!some cakes .");
+        sentence.iterateWords(tmp->{});
+
+        String removedWord = sentence.removeWord(2);
+
+        assertEquals("Put", removedWord);
+        assertEquals("The,dog!some cakes .", sentence.toString());
+    }
+
+    @Test
+    public void should(){
+        Sentence sentence = new Sentence("The gender wars are important but take a back seat to survival .");
+        sentence.iterateWords(word->{});
+
+        assertEquals(12, sentence.wordsCount());
     }
 }

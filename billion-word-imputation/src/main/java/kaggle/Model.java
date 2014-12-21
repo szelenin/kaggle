@@ -84,18 +84,28 @@ public class Model implements Serializable, KryoSerializable {
     }
 
     public String predict(String sentenceWords) {
+        logger.trace("Predict: {}", sentenceWords);
         int n = nGramCounts.getN();
         SentenceCounts sentenceCounts = new SentenceCounts(n);
 
-        List<NGram> nGrams = new ArrayList<>();
-
-        for (int i = n; i > 0; i--) {
-            NGram nGram = new NGram(i);
-            nGram.newSentence();
-            nGrams.add(nGram);
-        }
+        List<NGram> nGrams = createNGrams(n);
 
         Sentence sentence = new Sentence(sentenceWords);
+        updateSentenceCounts(sentenceCounts, nGrams, sentence);
+        logger.trace("Sentence counts: {}", sentenceCounts);
+
+        int wordNumber = sentenceCounts.minLikelihoodWordNumber();
+        logger.trace("Min likelihood word number {}", wordNumber);
+        List<String> nGramBefore = sentenceCounts.getWordsBefore(wordNumber);
+
+        List<String> wordsBeforeMissed = nGramBefore.subList(1, nGramBefore.size());
+        String mostFrequentWord = nGramCounts.getMaxMostFrequentWordAfter(wordsBeforeMissed);
+        logger.trace("Most frequent after {} : {}", wordsBeforeMissed, mostFrequentWord);
+        sentence.putWord(mostFrequentWord, wordNumber);
+        return sentence.toString();
+    }
+
+    private void updateSentenceCounts(SentenceCounts sentenceCounts, List<NGram> nGrams, Sentence sentence) {
         sentence.iterateWords(pair -> {
             for (NGram nGram : nGrams) {
                 String word = pair.getValue0();
@@ -103,12 +113,15 @@ public class Model implements Serializable, KryoSerializable {
                 sentenceCounts.add(pair.getValue1(), word, nGram.getN(), nGramCounts.getCount(nGram.getWords()));
             }
         });
+    }
 
-        int wordNumber = sentenceCounts.minLikelihoodWordNumber();
-        List<String> nGramBefore = sentenceCounts.getWordsBefore(wordNumber);
-
-        String mostFrequentWord = nGramCounts.getMaxMostFrequentWordAfter(nGramBefore.subList(1, nGramBefore.size()));
-        sentence.putWord(mostFrequentWord, wordNumber);
-        return sentence.toString();
+    private List<NGram> createNGrams(int n) {
+        List<NGram> nGrams = new ArrayList<>();
+        for (int i = n; i > 0; i--) {
+            NGram nGram = new NGram(i);
+            nGram.newSentence();
+            nGrams.add(nGram);
+        }
+        return nGrams;
     }
 }

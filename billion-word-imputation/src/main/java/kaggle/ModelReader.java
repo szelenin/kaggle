@@ -52,23 +52,6 @@ public class ModelReader {
         writeModel(model, currentPart);
         logger.info("Model written.");
         logger.info("Lines read: {}. Unique words: {}, total words: {}", model.sentencesRead(), model.uniqueWordsCount(), model.totalWords());
-/*
-        Model model = new Model(3);
-        int currentPart = 1;
-        int totalSentences = 30301028;
-        int totalParts = 10;
-        BufferedReader reader = new BufferedReader(new FileReader("D:\\workspace\\projects\\szelenin\\kaggle\\billion-word-imputation\\data\\train_part_4.txt"));
-        String line = reader.readLine();
-        while (line != null) {
-            model.put(line);
-            line = reader.readLine();
-            if (model.sentencesRead() % 1000 == 0) {
-                logger.info("Lines read: {}. Unique words: {}, total words: {}", model.sentencesRead(), model.uniqueWordsCount(), model.totalWords());
-            }
-        }
-        writeModel(model, 4);
-        logger.info("Lines read: {}. Unique words: {}, total words: {}", model.sentencesRead(), model.uniqueWordsCount(), model.totalWords());
-*/
     }
 
     private static void writeModel(Model model, int currentPart) throws IOException {

@@ -15,6 +15,7 @@ public class Sentence {
     private static final Pattern delimiter = Pattern.compile("\\s+|\\W");
     private static final Pattern wordPattern = Pattern.compile("(\\w+)");
     private LinkedList<Pair<String, Integer>> words;
+    private int wordsCount;
 
     public Sentence(String sentenceWords) {
 
@@ -25,7 +26,7 @@ public class Sentence {
         Matcher matcher = wordPattern.matcher(sentenceWords);
         words = new LinkedList<>();
 
-        int currentWord = 0;
+        wordsCount = 0;
         int previousRegionStart = 0;
         while (matcher.find()) {
             String delimiter = sentenceWords.substring(previousRegionStart, matcher.start());
@@ -33,11 +34,11 @@ public class Sentence {
                 words.add(new Pair<>(delimiter, -1));
             }
             String word = matcher.group();
-            Pair<String, Integer> pair = new Pair<>(word, currentWord);
+            Pair<String, Integer> pair = new Pair<>(word, wordsCount);
             words.add(pair);
             lambda.invoke(pair.setAt0(word.toLowerCase()));
             previousRegionStart = matcher.end();
-            currentWord++;
+            wordsCount++;
         }
         String ending = sentenceWords.substring(previousRegionStart, sentenceWords.length());
         if (!StringUtils.isEmpty(ending)) {
@@ -49,7 +50,7 @@ public class Sentence {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        words.forEach(pair->sb.append(pair.getValue0()));
+        words.forEach(pair -> sb.append(pair.getValue0()));
         return sb.toString();
     }
 
@@ -89,17 +90,31 @@ public class Sentence {
                 iterator.add(new Pair<>(" ", -1));
             }
         }
+        wordsCount++;
         return foundWord;
     }
 
-    private int lastWordPosition() {
-        Iterator<Pair<String, Integer>> iterator = words.descendingIterator();
+    public int wordsCount() {
+        return wordsCount;
+    }
+
+    public String removeWord(int position) {
+        ListIterator<Pair<String, Integer>> iterator = words.listIterator();
+        String removedWord = null;
         while (iterator.hasNext()) {
-            Pair<String, Integer> next = iterator.next();
-            if (next.getValue1() >= 0) {
-                return next.getValue1() + 1;
+            Pair<String, Integer> pair = iterator.next();
+            if (pair.getValue1() == position) {
+                removedWord = pair.getValue0();
+                iterator.remove();
+                if (iterator.hasPrevious()) {
+                    iterator.previous();
+                    iterator.remove();
+                }
+                wordsCount--;
+                break;
             }
+
         }
-        return -1;
+        return removedWord;
     }
 }
