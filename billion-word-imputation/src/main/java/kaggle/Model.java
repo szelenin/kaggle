@@ -24,7 +24,6 @@ public class Model implements Serializable, KryoSerializable {
 
     private static final long serialVersionUID = 1648607850532636804L;
     private NGramCounts nGramCounts;
-    private static final Pattern delimiter = Pattern.compile("\\s+|\\W");
     private int sentencesCount = 0;
     private int totalWords = 0;
 

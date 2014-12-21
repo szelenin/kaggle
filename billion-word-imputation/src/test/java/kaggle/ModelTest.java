@@ -168,18 +168,19 @@ public class ModelTest {
         ByteArrayOutputStream byteArrayOut = new ByteArrayOutputStream();
         Kryo kryo = new Kryo();
         Output output = new Output(byteArrayOut);
-        kryo.writeObject(output, model);
+        model.write(kryo, output);
         output.close();
 
         Input input = new Input(new ByteArrayInputStream(byteArrayOut.toByteArray()));
-
-        Model readModel = kryo.readObject(input, Model.class);
+        Model readModel = new Model();
+        readModel.read(kryo, input);
         input.close();
 
         assertEquals(5, readModel.uniqueWordsCount());
         assertEquals(2, readModel.sentencesRead());
         assertEquals(3, model.count("the", "cat"));
         assertEquals(2, model.count("likes", "the", "cat"));
+
     }
 
     @Test

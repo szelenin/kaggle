@@ -10,8 +10,8 @@ import java.io.*;
 /**
  * Created by szelenin on 12/11/2014.
  */
-public class ModelReader {
-    private static final Logger logger = LogManager.getLogger(ModelReader.class);
+public class TrainModel {
+    private static final Logger logger = LogManager.getLogger(TrainModel.class);
     private static final Kryo kryo = new Kryo();
 
     public static void main(String[] args) throws IOException {
@@ -59,7 +59,8 @@ public class ModelReader {
                 new FileOutputStream(
                         "D:\\workspace\\projects\\szelenin\\kaggle\\billion-word-imputation\\data\\model" + currentPart + ".kryo"));
         Output kryoOut = new Output(out);
-        kryo.writeObject(kryoOut, model);
+        model.write(kryo, kryoOut);
+//        kryo.writeObject(kryoOut, model);
         kryoOut.close();
 /*
 
