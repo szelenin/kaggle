@@ -25,6 +25,7 @@ public class Node implements Serializable, KryoSerializable {
     }
 
     private Node addChild(String word) {
+        assert word != null;
         Node child = getChild(word);
         if (child == null) {
             child = new Node();

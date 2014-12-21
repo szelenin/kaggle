@@ -19,7 +19,7 @@ public class TrainTestModels {
         for (int i = 1; i <= totalParts; i++) {
             logger.info("Start processing part {}", i);
             Model model = new Model(3);
-            BufferedReader reader = new BufferedReader(new FileReader("D:\\workspace\\projects\\szelenin\\kaggle\\billion-word-imputation\\data\\test_part_" + i + ".txt"));
+            BufferedReader reader = new BufferedReader(new FileReader("D:\\workspace\\projects\\szelenin\\kaggle\\billion-word-imputation\\data\\train_part_" + i + ".txt"));
             String line = reader.readLine();
             while (line != null) {
                 model.put(line);
@@ -37,7 +37,7 @@ public class TrainTestModels {
         logger.info("Writing model part {}", part);
         BufferedOutputStream out = new BufferedOutputStream(
                 new FileOutputStream(
-                        "D:\\workspace\\projects\\szelenin\\kaggle\\billion-word-imputation\\data\\model_test" + part + ".kryo"));
+                        "D:\\workspace\\projects\\szelenin\\kaggle\\billion-word-imputation\\data\\model_train_" + part + ".kryo"));
         Output kryoOut = new Output(out);
         model.write(kryo, kryoOut);
         kryoOut.close();
