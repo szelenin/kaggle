@@ -9,11 +9,14 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.javatuples.Pair;
 import org.javatuples.Tuple;
+import sun.plugin2.message.Message;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.math.BigInteger;
+import java.nio.charset.Charset;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -26,6 +29,7 @@ public class Model implements Serializable, KryoSerializable {
     private NGramCounts nGramCounts;
     private int sentencesCount = 0;
     private int totalWords = 0;
+    private final Map<String, SentenceCounts> countsMap = new HashMap<>();
 
     public Model() {
         this(2);
@@ -84,24 +88,57 @@ public class Model implements Serializable, KryoSerializable {
 
     public String predict(String sentenceWords) {
         logger.trace("Predict: {}", sentenceWords);
-        int n = nGramCounts.getN();
-        SentenceCounts sentenceCounts = new SentenceCounts(n);
 
-        List<NGram> nGrams = createNGrams(n);
-
-        Sentence sentence = new Sentence(sentenceWords);
-        updateSentenceCounts(sentenceCounts, nGrams, sentence);
-        logger.trace("Sentence counts: {}", sentenceCounts);
-
-        int wordNumber = sentenceCounts.minLikelihoodWordNumber();
-        logger.trace("Min likelihood word number {}", wordNumber);
+        SentenceCounts sentenceCounts = countsFor(sentenceWords);
+        updateNgramCounts(sentenceWords);
+        int wordNumber = missedWordNumber(sentenceWords);
         List<String> nGramBefore = sentenceCounts.getWordsBefore(wordNumber);
 
         List<String> wordsBeforeMissed = nGramBefore.subList(1, nGramBefore.size());
         String mostFrequentWord = nGramCounts.getMaxMostFrequentWordAfter(wordsBeforeMissed);
         logger.trace("Most frequent after {} : {}", wordsBeforeMissed, mostFrequentWord);
+        Sentence sentence = new Sentence(sentenceWords).iterateWords(word -> {});
         sentence.putWord(mostFrequentWord, wordNumber);
         return sentence.toString();
+    }
+
+    public int missedWordNumber(String sentenceWords) {
+        int wordNumber = countsFor(sentenceWords).minLikelihoodWordNumber();
+        logger.trace("Min likelihood word number {}", wordNumber);
+        return wordNumber;
+    }
+
+    public void updateNgramCounts(String sentenceWords) {
+        SentenceCounts sentenceCounts = countsFor(sentenceWords);
+
+        Sentence sentence = new Sentence(sentenceWords);
+        List<NGram> nGrams = createNGrams(nGramCounts.getN());
+
+        updateSentenceCounts(sentenceCounts, nGrams, sentence);
+
+        logger.trace("Sentence counts: {}", sentenceCounts);
+
+    }
+
+    private SentenceCounts countsFor(String sentence) {
+        MessageDigest digest = digest();
+        digest.update(sentence.getBytes());
+        BigInteger bigInt = new BigInteger(1, digest.digest());
+        String md5Sum = bigInt.toString(Character.MAX_RADIX);
+        SentenceCounts sentenceCounts = countsMap.get(md5Sum);
+        if (sentenceCounts == null) {
+            sentenceCounts = new SentenceCounts(nGramCounts.getN());
+        }
+        countsMap.put(md5Sum, sentenceCounts);
+        return sentenceCounts;
+    }
+
+    private MessageDigest digest(){
+        try {
+            return MessageDigest.getInstance("MD5");
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void updateSentenceCounts(SentenceCounts sentenceCounts, List<NGram> nGrams, Sentence sentence) {

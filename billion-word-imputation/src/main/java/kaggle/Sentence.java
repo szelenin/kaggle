@@ -22,7 +22,7 @@ public class Sentence {
         this.sentenceWords = sentenceWords;
     }
 
-    public void iterateWords(Lambda<Pair<String, Integer>> lambda) {
+    public Sentence iterateWords(Lambda<Pair<String, Integer>> lambda) {
         Matcher matcher = wordPattern.matcher(sentenceWords);
         words = new LinkedList<>();
 
@@ -44,7 +44,7 @@ public class Sentence {
         if (!StringUtils.isEmpty(ending)) {
             words.add(new Pair<>(ending, -1));
         }
-
+        return this;
     }
 
     @Override

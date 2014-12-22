@@ -3,7 +3,7 @@ package kaggle;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
-import org.junit.Ignore;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.io.*;
@@ -14,6 +14,13 @@ import static org.junit.Assert.assertEquals;
  * Created by szelenin on 12/9/2014.
  */
 public class ModelTest {
+
+    private Kryo kryo;
+
+    @Before
+    public void setUp() throws Exception {
+        kryo = new Kryo();
+    }
 
     @Test
     public void shouldInsertFromSentence() {
@@ -165,16 +172,9 @@ public class ModelTest {
         model.put("the dog likes the cat");
         model.put("the cat likes the cat");
 
-        ByteArrayOutputStream byteArrayOut = new ByteArrayOutputStream();
-        Kryo kryo = new Kryo();
-        Output output = new Output(byteArrayOut);
-        model.write(kryo, output);
-        output.close();
-
-        Input input = new Input(new ByteArrayInputStream(byteArrayOut.toByteArray()));
+        ByteArrayOutputStream byteArrayOut = writeModel(model);
         Model readModel = new Model();
-        readModel.read(kryo, input);
-        input.close();
+        readModel(byteArrayOut, readModel);
 
         assertEquals(5, readModel.uniqueWordsCount());
         assertEquals(2, readModel.sentencesRead());
@@ -191,4 +191,40 @@ public class ModelTest {
 
         assertEquals("the cat hates the dog", model.predict("the hates the dog"));
     }
+
+    @Test
+    public void shouldCalcMissedWordNumberWhenIncrementedModelLoads(){
+        Model model1 = new Model(3);
+        model1.put("the cat hates the dog");
+        ByteArrayOutputStream model1Out = writeModel(model1);
+
+        Model model2 = new Model(3);
+        model2.put("a dog likes the cat");
+        ByteArrayOutputStream model2Out = writeModel(model2);
+
+        Model model = new Model();
+        readModel(model1Out, model);
+        model.updateNgramCounts("a hates the dog");
+        assertEquals(0, model.missedWordNumber("the hates the dog"));
+
+        readModel(model2Out, model);
+        model.updateNgramCounts("a hates the dog");
+
+        assertEquals(1, model.missedWordNumber("a hates the dog"));
+    }
+
+    private void readModel(ByteArrayOutputStream byteArrayOut, Model model) {
+        Input input = new Input(new ByteArrayInputStream(byteArrayOut.toByteArray()));
+        model.read(kryo, input);
+        input.close();
+    }
+
+    private ByteArrayOutputStream writeModel(Model model) {
+        ByteArrayOutputStream byteArrayOut = new ByteArrayOutputStream();
+        Output output = new Output(byteArrayOut);
+        model.write(kryo, output);
+        output.close();
+        return byteArrayOut;
+    }
+
 }
