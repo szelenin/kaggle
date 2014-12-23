@@ -13,5 +13,8 @@
         <Logger name="kaggle" level="info" additivity="false">
             <AppenderRef ref="File"/>
         </Logger>
+        <Logger name="kaggle.IterativeWordNumberPredict" level="trace" additivity="false">
+            <AppenderRef ref="File"/>
+        </Logger>
     </Loggers>
 </Configuration>

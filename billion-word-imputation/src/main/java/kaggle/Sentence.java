@@ -22,6 +22,10 @@ public class Sentence {
         this.sentenceWords = sentenceWords;
     }
 
+    public Sentence iterateWords() {
+        return iterateWords(word->{});
+    }
+
     public Sentence iterateWords(Lambda<Pair<String, Integer>> lambda) {
         Matcher matcher = wordPattern.matcher(sentenceWords);
         words = new LinkedList<>();

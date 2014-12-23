@@ -12,34 +12,37 @@ public class TestDataGenerator {
     private static final Logger logger = LogManager.getLogger(TestDataGenerator.class);
 
     public static void main(String[] args) throws IOException {
-        BufferedReader reader = createSourceReader(1);
-        PrintWriter sentenceWriter = createOutWriter(1, "test_sentences");
-        PrintWriter removedWriter = createOutWriter(1, "test_removed");
-        String line = reader.readLine();
-        while (line != null) {
-            Sentence sentence = new Sentence(line);
-            sentence.iterateWords(tmp->{});
-            logger.trace("Sentence: {} | {}", sentence, sentence.wordsCount());
+        for (int i = 1; i <= 12; i++) {
+            BufferedReader reader = createSourceReader(i);
+            PrintWriter sentenceWriter = createOutWriter(i, "test");
+            PrintWriter removedWriter = createOutWriter(i, "removed");
+            String line = reader.readLine();
+            while (line != null) {
+                Sentence sentence = new Sentence(line);
+                sentence.iterateWords();
+                logger.trace("Sentence: {} | {}", sentence, sentence.wordsCount());
 
-            int randomWordNumber;
-            do {
-                randomWordNumber = (int) (Math.random() * sentence.wordsCount());
-                logger.trace("randomWordNumber = {}", randomWordNumber);
-            }while (sentence.wordsCount() > 2 & (randomWordNumber == 0 || randomWordNumber == (sentence.wordsCount() - 1)));
+                int randomWordNumber;
+                do {
+                    randomWordNumber = (int) (Math.random() * sentence.wordsCount());
+                    logger.trace("randomWordNumber = {}", randomWordNumber);
+                }
+                while (sentence.wordsCount() > 2 & (randomWordNumber == 0 || randomWordNumber == (sentence.wordsCount() - 1)));
 
-            String removedWord = sentence.removeWord(randomWordNumber);
-            logger.trace("Removed word: {}", removedWord);
-            sentenceWriter.println(sentence);
-            removedWriter.println(randomWordNumber + " : " + removedWord);
-            line = reader.readLine();
+                String removedWord = sentence.removeWord(randomWordNumber);
+                logger.trace("Removed word: {}", removedWord);
+                sentenceWriter.println(sentence);
+                removedWriter.println(randomWordNumber + " : " + removedWord);
+                line = reader.readLine();
+            }
+            reader.close();
+            sentenceWriter.close();
+            removedWriter.close();
         }
-        reader.close();
-        sentenceWriter.close();
-        removedWriter.close();
     }
 
     private static BufferedReader createSourceReader(int partNo) throws FileNotFoundException {
-        return new BufferedReader(new FileReader("D:\\workspace\\projects\\szelenin\\kaggle\\billion-word-imputation\\data\\test_part_" + partNo + ".txt"));
+        return new BufferedReader(new FileReader("D:\\workspace\\projects\\szelenin\\kaggle\\billion-word-imputation\\data\\train_valid_part_" + partNo + ".txt"));
     }
 
     private static PrintWriter createOutWriter(int currentPart, String suffix) throws FileNotFoundException {
