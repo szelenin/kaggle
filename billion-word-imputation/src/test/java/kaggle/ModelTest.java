@@ -205,12 +205,17 @@ public class ModelTest {
         Model model = new Model();
         readModel(model1Out, model);
         model.updateNgramCounts("a hates the dog");
-        assertEquals(0, model.missedWordNumber("the hates the dog"));
+        int missedWordNumber = model.missedWordNumber("the hates the dog");
+        assertEquals(0, missedWordNumber);
+        assertEquals("the", model.missedWord("the hates the dog", missedWordNumber));
 
         readModel(model2Out, model);
         model.updateNgramCounts("a hates the dog");
 
-        assertEquals(1, model.missedWordNumber("a hates the dog"));
+        missedWordNumber = model.missedWordNumber("a hates the dog");
+        assertEquals(1, missedWordNumber);
+        //this is initial implementation - should be improved to "cat hates"
+        assertEquals("dog", model.missedWord("a hates the dog", missedWordNumber));
     }
 
     private void readModel(ByteArrayOutputStream byteArrayOut, Model model) {
