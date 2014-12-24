@@ -29,7 +29,7 @@ public class Model implements Serializable, KryoSerializable {
     private NGramCounts nGramCounts;
     private int sentencesCount = 0;
     private int totalWords = 0;
-    private final Map<String, SentenceCounts> countsMap = new HashMap<>();
+    private final Map<BigInteger, SentenceCounts> countsMap = new HashMap<>();
 
     public Model() {
         this(2);
@@ -127,8 +127,7 @@ public class Model implements Serializable, KryoSerializable {
     private SentenceCounts countsFor(String sentence) {
         MessageDigest digest = digest();
         digest.update(sentence.getBytes());
-        BigInteger bigInt = new BigInteger(1, digest.digest());
-        String md5Sum = bigInt.toString(Character.MAX_RADIX);
+        BigInteger md5Sum = new BigInteger(1, digest.digest());
         SentenceCounts sentenceCounts = countsMap.get(md5Sum);
         if (sentenceCounts == null) {
             sentenceCounts = new SentenceCounts(nGramCounts.getN());
