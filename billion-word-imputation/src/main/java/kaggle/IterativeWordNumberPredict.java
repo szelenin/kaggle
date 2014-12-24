@@ -18,28 +18,29 @@ public class IterativeWordNumberPredict {
 
         Model model = new Model();
         kryo = new Kryo();
-        int modelPartNo = 1;
-        Input modelReader = createModelReader(modelPartNo);
-        logger.info("reading train model part {}...", modelPartNo);
-        model.read(kryo, modelReader);
-        logger.info("train model part {} read", modelPartNo);
-        for (int currentPart = 1; currentPart <= 12; currentPart++) {
-            BufferedReader reader = createTestPartReader(currentPart);
-            PrintWriter outWriter = createOutWriter(modelPartNo, currentPart);
-            logger.info("predicting word number and missed word in part {}", currentPart);
-            String line = reader.readLine();
-            while (line != null) {
-                int sentenceNo = model.updateNgramCounts(line);
-                int missedWordNumber = model.missedWordNumber(sentenceNo);
-                String missedWord = model.missedWord(sentenceNo, missedWordNumber);
-                logger.trace("{} : {} -> {}", missedWordNumber, missedWord, line);
-                outWriter.println(missedWordNumber+" : "+missedWord);
-                line = reader.readLine();
+        for (int modelPartNo = 1; modelPartNo <= 12; modelPartNo++) {
+            Input modelReader = createModelReader(modelPartNo);
+            logger.info("reading train model part {}...", modelPartNo);
+            model.read(kryo, modelReader);
+            modelReader.close();
+            logger.info("train model part {} read", modelPartNo);
+            for (int currentPart = 1; currentPart <= 12; currentPart++) {
+                BufferedReader reader = createTestPartReader(currentPart);
+                PrintWriter outWriter = createOutWriter(modelPartNo, currentPart);
+                logger.info("predicting word number and missed word in part {}", currentPart);
+                String line = reader.readLine();
+                while (line != null) {
+                    int sentenceNo = model.updateNgramCounts(line);
+                    int missedWordNumber = model.missedWordNumber(sentenceNo);
+                    String missedWord = model.missedWord(sentenceNo, missedWordNumber);
+                    logger.trace("{} : {} -> {}", missedWordNumber, missedWord, line);
+                    outWriter.println(missedWordNumber+" : "+missedWord);
+                    line = reader.readLine();
+                }
+                reader.close();
+                outWriter.close();
             }
-            reader.close();
-            outWriter.close();
         }
-        modelReader.close();
     }
 
     private static BufferedReader createTestPartReader(int partNo) throws FileNotFoundException {
