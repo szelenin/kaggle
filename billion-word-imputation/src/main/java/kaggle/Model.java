@@ -29,7 +29,8 @@ public class Model implements Serializable, KryoSerializable {
     private NGramCounts nGramCounts;
     private int sentencesCount = 0;
     private int totalWords = 0;
-    private final Map<BigInteger, SentenceCounts> countsMap = new HashMap<>();
+    private int currentSentenceNo = 0;
+    private List<SentenceCounts> sentenceCounts = new ArrayList<>();
 
     public Model() {
         this(2);
@@ -83,65 +84,54 @@ public class Model implements Serializable, KryoSerializable {
         nGramCounts = kryo.readObject(input, NGramCounts.class);
         sentencesCount = kryo.readObject(input, int.class);
         totalWords = kryo.readObject(input, int.class);
-
+        currentSentenceNo = 0;
     }
 
     public String predict(String sentenceWords) {
         logger.trace("Predict: {}", sentenceWords);
 
-        updateNgramCounts(sentenceWords);
-        int wordNumber = missedWordNumber(sentenceWords);
-        String mostFrequentWord = missedWord(sentenceWords, wordNumber);
+        int sentenceNo = updateNgramCounts2(sentenceWords);
+        int wordNumber = missedWordNumber(sentenceNo);
+        String mostFrequentWord = missedWord(sentenceNo, wordNumber);
 
-        Sentence sentence = new Sentence(sentenceWords).iterateWords(word -> {});
+        Sentence sentence = new Sentence(sentenceWords).iterateWords(word -> {
+        });
         sentence.putWord(mostFrequentWord, wordNumber);
         return sentence.toString();
     }
 
-    public String missedWord(String sentenceWords, int wordNumber) {
-        List<String> nGramBefore = countsFor(sentenceWords).getWordsBefore(wordNumber);
+    public String missedWord(int sentenceNo, int wordNumber) {
+        List<String> nGramBefore = countsFor(sentenceNo).getWordsBefore(wordNumber);
         List<String> wordsBeforeMissed = nGramBefore.subList(1, nGramBefore.size());
         String mostFrequentWord = nGramCounts.getMaxMostFrequentWordAfter(wordsBeforeMissed);
         logger.trace("Most frequent after {} : {}", wordsBeforeMissed, mostFrequentWord);
         return mostFrequentWord;
     }
 
-    public int missedWordNumber(String sentenceWords) {
-        int wordNumber = countsFor(sentenceWords).minLikelihoodWordNumber();
+    public int missedWordNumber(int currentSentenceNo) {
+        int wordNumber = countsFor(currentSentenceNo).minLikelihoodWordNumber();
         logger.trace("Min likelihood word number {}", wordNumber);
         return wordNumber;
     }
 
-    public void updateNgramCounts(String sentenceWords) {
-        SentenceCounts sentenceCounts = countsFor(sentenceWords);
+    public int updateNgramCounts2(String sentenceWords) {
+        SentenceCounts sentenceCounts = countsFor(currentSentenceNo);
 
         Sentence sentence = new Sentence(sentenceWords);
         List<NGram> nGrams = createNGrams(nGramCounts.getN());
 
         updateSentenceCounts(sentenceCounts, nGrams, sentence);
 
+        currentSentenceNo++;
         logger.trace("Sentence counts: {}", sentenceCounts);
-
+        return currentSentenceNo - 1;
     }
 
-    private SentenceCounts countsFor(String sentence) {
-        MessageDigest digest = digest();
-        digest.update(sentence.getBytes());
-        BigInteger md5Sum = new BigInteger(1, digest.digest());
-        SentenceCounts sentenceCounts = countsMap.get(md5Sum);
-        if (sentenceCounts == null) {
-            sentenceCounts = new SentenceCounts(nGramCounts.getN());
+    private SentenceCounts countsFor(int currentSentenceNo) {
+        if (sentenceCounts.size() < currentSentenceNo + 1) {
+            sentenceCounts.add(new SentenceCounts(nGramCounts.getN()));
         }
-        countsMap.put(md5Sum, sentenceCounts);
-        return sentenceCounts;
-    }
-
-    private MessageDigest digest(){
-        try {
-            return MessageDigest.getInstance("MD5");
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        }
+        return sentenceCounts.get(currentSentenceNo);
     }
 
     private void updateSentenceCounts(SentenceCounts sentenceCounts, List<NGram> nGrams, Sentence sentence) {
@@ -162,5 +152,9 @@ public class Model implements Serializable, KryoSerializable {
             nGrams.add(nGram);
         }
         return nGrams;
+    }
+
+    public int getSentenceCounts() {
+        return sentenceCounts.size();
     }
 }

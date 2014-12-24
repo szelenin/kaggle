@@ -204,18 +204,37 @@ public class ModelTest {
 
         Model model = new Model();
         readModel(model1Out, model);
-        model.updateNgramCounts("a hates the dog");
-        int missedWordNumber = model.missedWordNumber("the hates the dog");
+        int sentenceNo = model.updateNgramCounts2("a hates the dog");
+        int missedWordNumber = model.missedWordNumber(sentenceNo);
         assertEquals(0, missedWordNumber);
-        assertEquals("the", model.missedWord("the hates the dog", missedWordNumber));
+        assertEquals("the", model.missedWord(sentenceNo, missedWordNumber));
 
         readModel(model2Out, model);
-        model.updateNgramCounts("a hates the dog");
+        sentenceNo = model.updateNgramCounts2("a hates the dog");
 
-        missedWordNumber = model.missedWordNumber("a hates the dog");
+        missedWordNumber = model.missedWordNumber(sentenceNo);
         assertEquals(1, missedWordNumber);
         //this is initial implementation - should be improved to "cat hates"
-        assertEquals("dog", model.missedWord("a hates the dog", missedWordNumber));
+        assertEquals("dog", model.missedWord(sentenceNo, missedWordNumber));
+
+        assertEquals(1, model.getSentenceCounts());
+    }
+
+    @Test
+    public void shouldCalcMissedWordNumberWhenSeveralSentencesToPredict(){
+        Model model = new Model(3);
+        model.put("the dog likes the cat");
+        model.put("the cat hates the big dog");
+
+        int sentenceNo = model.updateNgramCounts2("the hates the dog");
+        int missedWordNumber = model.missedWordNumber(sentenceNo);
+        assertEquals(1, missedWordNumber);
+        assertEquals("cat", model.missedWord(sentenceNo, missedWordNumber));
+
+        sentenceNo = model.updateNgramCounts2("the dog the cat");
+        missedWordNumber = model.missedWordNumber(sentenceNo);
+        assertEquals(2, missedWordNumber);
+        assertEquals("likes", model.missedWord(sentenceNo, missedWordNumber));
     }
 
     private void readModel(ByteArrayOutputStream byteArrayOut, Model model) {

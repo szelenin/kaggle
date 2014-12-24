@@ -29,9 +29,9 @@ public class IterativeWordNumberPredict {
             logger.info("predicting word number and missed word in part {}", currentPart);
             String line = reader.readLine();
             while (line != null) {
-                model.updateNgramCounts(line);
-                int missedWordNumber = model.missedWordNumber(line);
-                String missedWord = model.missedWord(line, missedWordNumber);
+                int sentenceNo = model.updateNgramCounts2(line);
+                int missedWordNumber = model.missedWordNumber(sentenceNo);
+                String missedWord = model.missedWord(sentenceNo, missedWordNumber);
                 logger.trace("{} : {} -> {}", missedWordNumber, missedWord, line);
                 outWriter.println(missedWordNumber+" : "+missedWord);
                 line = reader.readLine();
