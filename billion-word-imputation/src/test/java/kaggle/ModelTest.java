@@ -204,13 +204,13 @@ public class ModelTest {
 
         Model model = new Model();
         readModel(model1Out, model);
-        int sentenceNo = model.updateNgramCounts2("a hates the dog");
+        int sentenceNo = model.updateNgramCounts("a hates the dog");
         int missedWordNumber = model.missedWordNumber(sentenceNo);
         assertEquals(0, missedWordNumber);
         assertEquals("the", model.missedWord(sentenceNo, missedWordNumber));
 
         readModel(model2Out, model);
-        sentenceNo = model.updateNgramCounts2("a hates the dog");
+        sentenceNo = model.updateNgramCounts("a hates the dog");
 
         missedWordNumber = model.missedWordNumber(sentenceNo);
         assertEquals(1, missedWordNumber);
@@ -226,12 +226,12 @@ public class ModelTest {
         model.put("the dog likes the cat");
         model.put("the cat hates the big dog");
 
-        int sentenceNo = model.updateNgramCounts2("the hates the dog");
+        int sentenceNo = model.updateNgramCounts("the hates the dog");
         int missedWordNumber = model.missedWordNumber(sentenceNo);
         assertEquals(1, missedWordNumber);
         assertEquals("cat", model.missedWord(sentenceNo, missedWordNumber));
 
-        sentenceNo = model.updateNgramCounts2("the dog the cat");
+        sentenceNo = model.updateNgramCounts("the dog the cat");
         missedWordNumber = model.missedWordNumber(sentenceNo);
         assertEquals(2, missedWordNumber);
         assertEquals("likes", model.missedWord(sentenceNo, missedWordNumber));

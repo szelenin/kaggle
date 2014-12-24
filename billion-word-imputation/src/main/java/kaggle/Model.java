@@ -4,20 +4,11 @@ import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.KryoSerializable;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.javatuples.Pair;
-import org.javatuples.Tuple;
-import sun.plugin2.message.Message;
 
 import java.io.Serializable;
-import java.math.BigInteger;
-import java.nio.charset.Charset;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.*;
-import java.util.regex.Pattern;
 
 /**
  * Created by szelenin on 12/9/2014.
@@ -90,7 +81,7 @@ public class Model implements Serializable, KryoSerializable {
     public String predict(String sentenceWords) {
         logger.trace("Predict: {}", sentenceWords);
 
-        int sentenceNo = updateNgramCounts2(sentenceWords);
+        int sentenceNo = updateNgramCounts(sentenceWords);
         int wordNumber = missedWordNumber(sentenceNo);
         String mostFrequentWord = missedWord(sentenceNo, wordNumber);
 
@@ -114,7 +105,7 @@ public class Model implements Serializable, KryoSerializable {
         return wordNumber;
     }
 
-    public int updateNgramCounts2(String sentenceWords) {
+    public int updateNgramCounts(String sentenceWords) {
         SentenceCounts sentenceCounts = countsFor(currentSentenceNo);
 
         Sentence sentence = new Sentence(sentenceWords);
