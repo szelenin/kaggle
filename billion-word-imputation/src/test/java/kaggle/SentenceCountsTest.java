@@ -44,6 +44,14 @@ public class SentenceCountsTest {
         assertThat(sentenceCount.getWordsBefore(1)).containsExactly("*", "*", "the");
     }
 
+    @Test
+    public void shouldCalcLikelihoodWhenOneWord() {
+        SentenceCounts sentenceCount = new SentenceCounts(3);
+
+        assertEquals(0, sentenceCount.minLikelihoodWordNumber());
+        assertThat(sentenceCount.getWordsBefore(0)).containsExactly("*", "*", "*");
+    }
+
     private void addWord(SentenceCounts sentenceCount, int position, String word, int... nGramCounts) {
         for (int i = 0; i < nGramCounts.length; i++) {
             int count = nGramCounts[i];

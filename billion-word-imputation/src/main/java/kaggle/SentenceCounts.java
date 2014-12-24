@@ -8,7 +8,8 @@ import java.util.*;
 public class SentenceCounts {
     private int maxNgramLength;
 
-    private Map<Integer, WordCount> wordCounts = new LinkedHashMap<>();
+    private WordCount[] wordCounts = new WordCount[1];
+
     public SentenceCounts(int maxNgramLength) {
         assert maxNgramLength >= 2;
         this.maxNgramLength = maxNgramLength;
@@ -19,7 +20,10 @@ public class SentenceCounts {
         int minLikelihoodWordNumber = 0;
         double minLogLikelihood = Double.MAX_VALUE;
         int counter = 0;
-        for (WordCount wordCount : wordCounts.values()) {
+        for (WordCount wordCount : wordCounts) {
+            if (wordCount == null) {
+                return 0;
+            }
             double logLikelihood = wordCount.weighedNGramLogLikelihood(maxNgramLength);
             if (logLikelihood < minLogLikelihood) {
                 minLogLikelihood = logLikelihood;
@@ -32,19 +36,24 @@ public class SentenceCounts {
     }
 
     public void add(int position, String word, int n, int count) {
-        WordCount wordCount = wordCounts.get(position);
+        if (wordCounts.length < position + 1) {
+            WordCount[] newWordCounts = new WordCount[wordCounts.length + 1];
+            System.arraycopy(wordCounts, 0, newWordCounts, 0, wordCounts.length);
+            wordCounts = newWordCounts;
+        }
+        WordCount wordCount = wordCounts[position];
         if (wordCount == null) {
             wordCount = new WordCount(word, maxNgramLength);
         }
         wordCount.incrementCount(n, count);
-        wordCounts.put(position, wordCount);
+        wordCounts[position] = wordCount;
     }
 
     public List<String> getWordsBefore(int wordNumber) {
         LinkedList<String> result = new LinkedList<>();
         int count = maxNgramLength;
         for (int i = wordNumber - 1; i >= 0 & count-- > 0; i--) {
-            result.addFirst(wordCounts.get(i).word);
+            result.addFirst(wordCounts[i].word);
         }
         for (int i = count; i >= 0; i--) {
             result.addFirst("*");
@@ -55,10 +64,9 @@ public class SentenceCounts {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        wordCounts.entrySet().forEach(entry -> {
-            WordCount count = entry.getValue();
-            sb.append(count).append(" | ");
-        });
+        for (WordCount wordCount : wordCounts) {
+            sb.append(wordCount).append(" | ");
+        }
         return sb.toString();
     }
 
