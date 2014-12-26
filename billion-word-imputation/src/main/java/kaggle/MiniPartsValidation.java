@@ -18,32 +18,34 @@ public class MiniPartsValidation {
     private static Pattern pattern = Pattern.compile("(\\d+)\\s+\\:\\s+(.+)");
 
     public static void main(String[] args) throws IOException {
-        int modelNo = 1;
-        int totalLines = 0;
-        int wordPositionsCorrect = 0;
-        int wordsCorrect = 0;
-        for (int partNo = 1; partNo <= 12; partNo++) {
-            BufferedReader predictedPartReader = createPredictedPartReader(modelNo, partNo);
-            BufferedReader validationPartReader = createValidationPartReader(partNo);
-            String predictedLine = predictedPartReader.readLine();
-            String validationLine = validationPartReader.readLine();
-            while (predictedLine != null && validationLine != null) {
-                totalLines++;
-                Pair<Integer, String> predicted = positionWordPair(predictedLine);
-                Pair<Integer, String> validation = positionWordPair(validationLine);
-                if (predicted.getValue0().equals(validation.getValue0())) {
-                    wordPositionsCorrect++;
+        for (int modelNo = 1; modelNo <= 12; modelNo++) {
+
+            int totalLines = 0;
+            int wordPositionsCorrect = 0;
+            int wordsCorrect = 0;
+            for (int partNo = 1; partNo <= 5; partNo++) {
+                BufferedReader predictedPartReader = createPredictedPartReader(modelNo, partNo);
+                BufferedReader validationPartReader = createValidationPartReader(partNo);
+                String predictedLine = predictedPartReader.readLine();
+                String validationLine = validationPartReader.readLine();
+                while (predictedLine != null && validationLine != null) {
+                    totalLines++;
+                    Pair<Integer, String> predicted = positionWordPair(predictedLine);
+                    Pair<Integer, String> validation = positionWordPair(validationLine);
+                    if (predicted.getValue0().equals(validation.getValue0())) {
+                        wordPositionsCorrect++;
+                    }
+                    if (predicted.getValue1().equals(validation.getValue1())) {
+                        wordsCorrect++;
+                    }
+                    predictedLine = predictedPartReader.readLine();
+                    validationLine = validationPartReader.readLine();
                 }
-                if (predicted.getValue1().equals(validation.getValue1())) {
-                    wordsCorrect++;
-                }
-                predictedLine = predictedPartReader.readLine();
-                validationLine = validationPartReader.readLine();
+                predictedPartReader.close();
+                validationPartReader.close();
             }
-            predictedPartReader.close();
-            validationPartReader.close();
+            System.out.println(String.format("---Model part %d---\nTotal lines: %d\nCorrect word positions: %d\nCorrect words: %d", modelNo, totalLines, wordPositionsCorrect, wordsCorrect));
         }
-        System.out.println(String.format("---Model part %d---\nTotal lines: %d\nCorrect word positions: %d\nCorrect words: %d", modelNo, totalLines, wordPositionsCorrect, wordsCorrect));
     }
 
     private static BufferedReader createPredictedPartReader(int modelNo, int partNo) throws FileNotFoundException {
@@ -55,10 +57,14 @@ public class MiniPartsValidation {
     }
 
     private static Pair<Integer, String> positionWordPair(String line) {
+/*
         Matcher matcher = pattern.matcher(line);
         if (matcher.matches()) {
             return new Pair<>(Integer.valueOf(matcher.group(1)), matcher.group(2));
         }
-        throw new AssertionError("Line '" +line+ "' does not follow pattern");
+*/
+        String[] split = line.split(":");
+
+        return new Pair<>(Integer.valueOf(split[0].trim()), split[1].trim());
     }
 }

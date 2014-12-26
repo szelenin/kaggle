@@ -72,6 +72,7 @@ public class Model implements Serializable, KryoSerializable {
 
     @Override
     public void read(Kryo kryo, Input input) {
+        nGramCounts = null;
         nGramCounts = kryo.readObject(input, NGramCounts.class);
         sentencesCount = kryo.readObject(input, int.class);
         totalWords = kryo.readObject(input, int.class);

@@ -24,7 +24,7 @@ public class IterativeWordNumberPredict {
             model.read(kryo, modelReader);
             modelReader.close();
             logger.info("train model part {} read", modelPartNo);
-            for (int currentPart = 1; currentPart <= 12; currentPart++) {
+            for (int currentPart = 1; currentPart <= 5; currentPart++) {
                 BufferedReader reader = createTestPartReader(currentPart);
                 PrintWriter outWriter = createOutWriter(modelPartNo, currentPart);
                 logger.info("predicting word number and missed word in part {}", currentPart);
