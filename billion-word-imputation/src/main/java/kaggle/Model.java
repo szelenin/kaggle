@@ -94,9 +94,11 @@ public class Model implements Serializable, KryoSerializable {
     }
 
     public String missedWord(int sentenceNo, int wordNumber) {
-        List<String> nGramBefore = countsFor(sentenceNo).getWordsBefore(wordNumber);
+        SentenceCounts sentenceCounts = countsFor(sentenceNo);
+        List<String> nGramBefore = sentenceCounts.getWordsBefore(wordNumber);
         List<String> wordsBeforeMissed = nGramBefore.subList(1, nGramBefore.size());
         Pair<String, Integer> mostFrequentWord = nGramCounts.getMaxMostFrequentWordAfter(wordsBeforeMissed);
+        mostFrequentWord = sentenceCounts.updateMostFrequentWord(mostFrequentWord);
         logger.trace("Most frequent after {} : {}", wordsBeforeMissed, mostFrequentWord);
         return mostFrequentWord.getValue0();
     }

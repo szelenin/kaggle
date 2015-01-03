@@ -1,9 +1,11 @@
 package kaggle;
 
+import org.javatuples.Pair;
 import org.junit.Test;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class SentenceCountsTest {
     @Test
@@ -42,6 +44,63 @@ public class SentenceCountsTest {
 
         assertEquals(1, sentenceCount.minLikelihoodWordNumber());
         assertThat(sentenceCount.getWordsBefore(1)).containsExactly("*", "*", "the");
+    }
+
+    @Test
+    public void shouldUpdateMostFrequentWordWhenNull(){
+        SentenceCounts sentenceCounts = new SentenceCounts(3);
+
+        assertNull(sentenceCounts.updateMostFrequentWord(null));
+    }
+
+    @Test
+    public void shouldUpdateMostFrequentWordWhenFirstCall(){
+        SentenceCounts sentenceCounts = new SentenceCounts(3);
+
+        assertEquals(new Pair<>("dog", 3), sentenceCounts.updateMostFrequentWord(new Pair<>("dog", 3)));
+    }
+
+    @Test
+    public void shouldUpdateMostFrequentWordWhenSecondCallHasLargerAmount(){
+        SentenceCounts sentenceCounts = new SentenceCounts(3);
+        sentenceCounts.updateMostFrequentWord(new Pair<>("dog", 1));
+
+        assertEquals(new Pair<>("cat", 2), sentenceCounts.updateMostFrequentWord(new Pair<>("cat", 2)));
+    }
+
+    @Test
+    public void shouldUpdateMostFrequentWordWhenFirstCallHasLargerAmount(){
+        SentenceCounts sentenceCounts = new SentenceCounts(3);
+        sentenceCounts.updateMostFrequentWord(new Pair<>("dog", 2));
+
+        assertEquals(new Pair<>("dog", 2), sentenceCounts.updateMostFrequentWord(new Pair<>("cat", 1)));
+    }
+
+    @Test
+    public void shouldUpdateMostFrequentWordWhenFirstCallHasLargerAmount2(){
+        SentenceCounts sentenceCounts = new SentenceCounts(3);
+        sentenceCounts.updateMostFrequentWord(new Pair<>("dog", 2));
+
+        assertEquals(new Pair<>("dog", 3), sentenceCounts.updateMostFrequentWord(new Pair<>("dog", 1)));
+    }
+
+    @Test
+    public void shouldUpdateMostFrequentWordIncremetally(){
+        SentenceCounts sentenceCounts = new SentenceCounts(3);
+        sentenceCounts.updateMostFrequentWord(new Pair<>("cat", 1));
+        sentenceCounts.updateMostFrequentWord(new Pair<>("cat", 1));
+
+        assertEquals(new Pair<>("cat", 3), sentenceCounts.updateMostFrequentWord(new Pair<>("cat", 1)));
+    }
+
+    @Test
+    public void shouldUpdateMostFrequentWordIncremetallyDifferentWords(){
+        SentenceCounts sentenceCounts = new SentenceCounts(3);
+        sentenceCounts.updateMostFrequentWord(new Pair<>("cat", 1));
+        sentenceCounts.updateMostFrequentWord(new Pair<>("cat", 1));
+
+        assertEquals(new Pair<>("cat", 2), sentenceCounts.updateMostFrequentWord(new Pair<>("dog", 1)));
+        assertEquals(new Pair<>("dog", 3), sentenceCounts.updateMostFrequentWord(new Pair<>("dog", 2)));
     }
 
     @Test

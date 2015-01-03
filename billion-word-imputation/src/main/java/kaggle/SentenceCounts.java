@@ -1,5 +1,9 @@
 package kaggle;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.Maps;
+import org.javatuples.Pair;
+
 import java.util.*;
 
 /**
@@ -9,6 +13,7 @@ public class SentenceCounts {
     private int maxNgramLength;
 
     private WordCount[] wordCounts = new WordCount[1];
+    private LinkedList<Pair<String, Integer>> mostFrequentWords = new LinkedList<>();
 
     public SentenceCounts(int maxNgramLength) {
         assert maxNgramLength >= 2;
@@ -68,6 +73,37 @@ public class SentenceCounts {
             sb.append(wordCount).append(" | ");
         }
         return sb.toString();
+    }
+
+    public Pair<String, Integer> updateMostFrequentWord(Pair<String, Integer> mostFrequentWord) {
+        if (mostFrequentWord == null) {
+            return null;
+        }
+
+        ListIterator<Pair<String, Integer>> iterator = mostFrequentWords.listIterator();
+        boolean found = false;
+        int maxCount = 0;
+        Pair<String, Integer> result = mostFrequentWord;
+        while (iterator.hasNext()) {
+            Pair<String, Integer> next = iterator.next();
+            if (next.getValue0().equals(mostFrequentWord.getValue0())) {
+                next = next.setAt1(mostFrequentWord.getValue1() + next.getValue1());
+                iterator.set(next);
+                result = next;
+                found = true;
+            }
+            if (next.getValue1() > maxCount) {
+                maxCount = next.getValue1();
+                result = next;
+            }
+        }
+        if (!found) {
+            mostFrequentWords.addLast(mostFrequentWord);
+            if (mostFrequentWord.getValue1() > maxCount) {
+                return mostFrequentWord;
+            }
+        }
+        return result;
     }
 
     private class WordCount {

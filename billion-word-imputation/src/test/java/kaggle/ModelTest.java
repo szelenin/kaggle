@@ -9,6 +9,7 @@ import org.junit.Test;
 import java.io.*;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  * Created by szelenin on 12/9/2014.
@@ -194,30 +195,59 @@ public class ModelTest {
 
     @Test
     public void shouldCalcMissedWordNumberWhenIncrementedModelLoads(){
-        Model model1 = new Model(3);
-        model1.put("the cat hates the dog");
-        ByteArrayOutputStream model1Out = writeModel(model1);
-
-        Model model2 = new Model(3);
-        model2.put("a dog likes the cat");
-        ByteArrayOutputStream model2Out = writeModel(model2);
+        ByteArrayOutputStream model1Out = createAndWriteModel("the cat hates the dog");
+        ByteArrayOutputStream model2Out = createAndWriteModel("a dog likes the cat");
 
         Model model = new Model();
+
+        // updating ngram counts
         readModel(model1Out, model);
         int sentenceNo = model.updateNgramCounts("a hates the dog");
         int missedWordNumber = model.missedWordNumber(sentenceNo);
         assertEquals(0, missedWordNumber);
-        assertEquals("the", model.missedWord(sentenceNo, missedWordNumber));
 
         readModel(model2Out, model);
         sentenceNo = model.updateNgramCounts("a hates the dog");
-
         missedWordNumber = model.missedWordNumber(sentenceNo);
         assertEquals(1, missedWordNumber);
-        //this is initial implementation - should be improved to "cat hates"
-        assertEquals("dog", model.missedWord(sentenceNo, missedWordNumber));
-
         assertEquals(1, model.getSentenceCounts());
+
+        // predicting missing word
+        readModel(model1Out, model);
+        assertEquals(missedWordNumber, model.missedWordNumber(0));
+        assertEquals("", model.missedWord(0, missedWordNumber));
+
+        readModel(model2Out, model);
+        assertEquals(missedWordNumber, model.missedWordNumber(0));
+//        //this is initial implementation - should be improved to "cat hates"
+        assertEquals("dog", model.missedWord(0, missedWordNumber));
+    }
+
+    @Test
+    public void shouldImproveWordPredictionAfterModelLoad(){
+        ByteArrayOutputStream model1Out = createAndWriteModel("the cat loves mouse", "the cat loves cheese");
+        ByteArrayOutputStream model2Out = createAndWriteModel("the dog loves the cat");
+
+        Model model = new Model();
+        readModel(model1Out, model);
+        assertMissedWord(model, "cat", "the loves");
+
+        readModel(model2Out, model);
+        assertMissedWord(model, "cat", "the loves");
+    }
+
+    private void assertMissedWord(Model model, String expectedMissedWord, String sentenceWords) {
+        int sentenceNo = model.updateNgramCounts(sentenceWords);
+        int missedWordNumber = model.missedWordNumber(sentenceNo);
+        assertEquals(expectedMissedWord, model.missedWord(sentenceNo, missedWordNumber));
+    }
+
+    private ByteArrayOutputStream createAndWriteModel(String ... sentences) {
+        Model model = new Model(3);
+        for (String sentence : sentences) {
+            model.put(sentence);
+        }
+        return writeModel(model);
     }
 
     @Test
