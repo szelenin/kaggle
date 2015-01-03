@@ -4,6 +4,7 @@ import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.KryoSerializable;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
+import org.javatuples.Pair;
 
 import java.io.Serializable;
 import java.util.*;
@@ -86,7 +87,7 @@ public class Node implements Serializable, KryoSerializable {
         count = kryo.readObjectOrNull(input, int.class);
     }
 
-    public String mostFrequentChild() {
+    public Pair<String, Integer> mostFrequentChild() {
         int maxCounter = Integer.MIN_VALUE;
         String word = null;
         for (Map.Entry<String, Node> entry : children.entrySet()) {
@@ -95,6 +96,6 @@ public class Node implements Serializable, KryoSerializable {
                 word = entry.getKey();
             }
         }
-        return word;
+        return new Pair<>(word, maxCounter);
     }
 }

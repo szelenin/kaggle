@@ -10,15 +10,16 @@ import java.io.*;
 /**
  * Created by szelenin on 12/11/2014.
  */
-public class TrainTestModels {
-    private static final Logger logger = LogManager.getLogger(TrainTestModels.class);
+public class TrainMiniModels {
+    private static final Logger logger = LogManager.getLogger(TrainMiniModels.class);
     private static final Kryo kryo = new Kryo();
 
     public static void main(String[] args) throws IOException {
         int totalParts = 12;
+        int nGramCount = 5;
         for (int i = 1; i <= totalParts; i++) {
             logger.info("Start processing part {}", i);
-            Model model = new Model(3);
+            Model model = new Model(nGramCount);
             BufferedReader reader = new BufferedReader(new FileReader("D:\\workspace\\projects\\szelenin\\kaggle\\billion-word-imputation\\data\\train_part_" + i + ".txt"));
             String line = reader.readLine();
             while (line != null) {
@@ -28,16 +29,16 @@ public class TrainTestModels {
                     logger.info("Lines read: {}. Unique words: {}, total words: {}", model.sentencesRead(), model.uniqueWordsCount(), model.totalWords());
                 }
             }
-            writeModel(model, i);
+            writeModel(model, nGramCount, i);
             reader.close();
         }
     }
 
-    private static void writeModel(Model model, int part) throws IOException {
+    private static void writeModel(Model model, int nGramCount, int part) throws IOException {
         logger.info("Writing model part {}", part);
         BufferedOutputStream out = new BufferedOutputStream(
                 new FileOutputStream(
-                        "D:\\workspace\\projects\\szelenin\\kaggle\\billion-word-imputation\\data\\model_train_" + part + ".kryo"));
+                        "D:\\workspace\\projects\\szelenin\\kaggle\\billion-word-imputation\\data\\model_" + nGramCount + "train_" + part + ".kryo"));
         Output kryoOut = new Output(out);
         model.write(kryo, kryoOut);
         kryoOut.close();

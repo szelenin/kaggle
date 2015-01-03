@@ -10,16 +10,18 @@ import java.io.*;
 /**
  * Created by szelenin on 12/11/2014.
  */
-public class TrainModel {
-    private static final Logger logger = LogManager.getLogger(TrainModel.class);
+public class TrainBigModel {
+    private static final Logger logger = LogManager.getLogger(TrainBigModel.class);
     private static final Kryo kryo = new Kryo();
+    private static final String ROOT_FOLDER = "D:\\workspace\\projects\\szelenin\\kaggle\\billion-word-imputation\\data\\5-ngrams";
 
     public static void main(String[] args) throws IOException {
-        Model model = new Model(3);
+        int nGramsCount = 5;
+        Model model = new Model(nGramsCount);
         int currentPart = 1;
         int totalSentences = 30301028;
-        int totalParts = 12;
-        BufferedReader reader = new BufferedReader(new FileReader("D:\\workspace\\projects\\szelenin\\kaggle\\billion-word-imputation\\data\\train_v2.txt"));
+        int totalParts = 50;
+        BufferedReader reader = new BufferedReader(new FileReader(new File(ROOT_FOLDER, "../train_v2.txt")));
         PrintWriter trainPartOut = createPartOutStream(currentPart, "train");
         PrintWriter testPartOut = createPartOutStream(currentPart, "test");
         String line = reader.readLine();
@@ -43,7 +45,7 @@ public class TrainModel {
                 currentPart++;
                 trainPartOut = createPartOutStream(currentPart, "train");
                 testPartOut = createPartOutStream(currentPart, "test");
-                model = new Model(3);
+                model = new Model(nGramsCount);
             }
         }
         trainPartOut.close();
@@ -56,25 +58,15 @@ public class TrainModel {
 
     private static void writeModel(Model model, int currentPart) throws IOException {
         BufferedOutputStream out = new BufferedOutputStream(
-                new FileOutputStream(
-                        "D:\\workspace\\projects\\szelenin\\kaggle\\billion-word-imputation\\data\\model" + currentPart + ".kryo"));
+                new FileOutputStream(new File(ROOT_FOLDER,"model" + currentPart + ".kryo")));
         Output kryoOut = new Output(out);
         model.write(kryo, kryoOut);
-//        kryo.writeObject(kryoOut, model);
         kryoOut.close();
-/*
-
-        ObjectOutputStream objectOutputStream = new ObjectOutputStream(out);
-        objectOutputStream.writeObject(model);
-        objectOutputStream.close();
-*/
     }
 
-    private static PrintWriter createPartOutStream(int currentPart, String suffix) throws FileNotFoundException {
+    private static PrintWriter createPartOutStream(int currentPart, String prefix) throws FileNotFoundException {
         try {
-            return new PrintWriter(new BufferedWriter(new FileWriter("D:\\workspace\\projects\\szelenin\\kaggle\\billion-word-imputation\\data\\" +
-                    suffix +
-                    "_part_" + currentPart + ".txt")));
+            return new PrintWriter(new BufferedWriter(new FileWriter(new File(ROOT_FOLDER, prefix + "_part_" + currentPart + ".txt"))));
         } catch (IOException e) {
             e.printStackTrace();
         }

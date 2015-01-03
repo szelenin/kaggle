@@ -6,6 +6,7 @@ import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.javatuples.Pair;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -71,18 +72,18 @@ public class NGramCounts implements Serializable, KryoSerializable {
         n = kryo.readObject(input, int.class);
     }
 
-    public String getMaxMostFrequentWordAfter(List<String> wordSequence) {
+    public Pair<String, Integer> getMaxMostFrequentWordAfter(List<String> wordSequence) {
         if (wordSequence.size() >= n) {
             throw new IllegalArgumentException("Count of words in sequence should be maximum n-1");
         }
         Node node = rootNode.getNode(wordSequence);
         if (node == null) {
-            return "";
+            return new Pair<>("", 0);
         }
         return node.mostFrequentChild();
     }
 
-    public String getMaxMostFrequentWordAfter(String... wordSequence) {
+    public Pair<String, Integer> getMaxMostFrequentWordWithCountAfter(String ... wordSequence) {
         return getMaxMostFrequentWordAfter(Arrays.asList(wordSequence));
     }
 }

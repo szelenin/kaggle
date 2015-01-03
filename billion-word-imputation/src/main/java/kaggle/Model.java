@@ -6,6 +6,7 @@ import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.javatuples.Pair;
 
 import java.io.Serializable;
 import java.util.*;
@@ -95,9 +96,9 @@ public class Model implements Serializable, KryoSerializable {
     public String missedWord(int sentenceNo, int wordNumber) {
         List<String> nGramBefore = countsFor(sentenceNo).getWordsBefore(wordNumber);
         List<String> wordsBeforeMissed = nGramBefore.subList(1, nGramBefore.size());
-        String mostFrequentWord = nGramCounts.getMaxMostFrequentWordAfter(wordsBeforeMissed);
+        Pair<String, Integer> mostFrequentWord = nGramCounts.getMaxMostFrequentWordAfter(wordsBeforeMissed);
         logger.trace("Most frequent after {} : {}", wordsBeforeMissed, mostFrequentWord);
-        return mostFrequentWord;
+        return mostFrequentWord.getValue0();
     }
 
     public int missedWordNumber(int currentSentenceNo) {
